@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package users;
+
+import "users/enum.proto";
+import "users/document.proto";
+import "users/address.proto";
+
+message KYCRequest {
+  string user_id = 1;
+}
+
+message Kyc {
+  string id = 1;
+  repeated Document documentsAndIdentity = 2;
+  Address individual_customer_address = 3;
+  string signature = 4;
+  string bvn = 5;
+  string passport_photograph = 6;
+  string kyc_level = 7;
+  string tin = 8;
+  bool bvn_verified = 9;
+  string nin = 10;
+  bool nin_verified = 11;
+  bool tin_verified = 12;
+  bool passport_photograph_verified = 13;
+  string tier = 14;
+  string driving_license = 15;
+  bool driving_license_verified = 16;
+  string international_passport_number = 17;
+  bool international_passport_number_verified = 18;
+  string voters_card_number = 19;
+}
+
+message KYCStatus {
+  VerificationStatus verification_status = 1;
+  string message = 2;
+}

@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package telemetry;
+
+import "telemetry/enum.proto";
+
+message SensorReading {
+  string id = 1;
+  string farm_id = 2;
+  SensorType sensor_type = 3;
+  double value = 4;
+  string unit = 5;
+  DataSource source = 6;
+  string recorded_at = 7;
+}
+
+message RecordSensorReadingRequest {
+  string farm_id = 1;
+  SensorType sensor_type = 2;
+  double value = 3;
+  string unit = 4;
+  DataSource source = 5;
+  string recorded_at = 6;
+}
+
+message RecordSensorReadingResponse {
+  string code = 1;
+  string message = 2;
+  SensorReading reading = 3;
+}
+
+message GetSensorReadingsRequest {
+  string farm_id = 1;
+  SensorType sensor_type = 2;
+}
+
+message GetSensorReadingsResponse {
+  repeated SensorReading readings = 1;
+}
+
+message GetLatestSensorReadingRequest {
+  string farm_id = 1;
+  SensorType sensor_type = 2;
+}
+
+message GetLatestSensorReadingResponse {
+  string code = 1;
+  string message = 2;
+  SensorReading reading = 3;
+}

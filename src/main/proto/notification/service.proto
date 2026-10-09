@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package notification;
+
+import "notification/notification.proto";
+import "notification/preference.proto";
+
+service NotificationService {
+  rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse);
+  rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse);
+  rpc GetNotificationsByRecipient(GetNotificationsByRecipientRequest) returns (GetNotificationsByRecipientResponse);
+  rpc MarkAsRead(MarkAsReadRequest) returns (MarkAsReadResponse);
+  rpc GetUnreadCount(GetUnreadCountRequest) returns (GetUnreadCountResponse);
+
+  rpc SetNotificationPreferences(SetNotificationPreferencesRequest) returns (SetNotificationPreferencesResponse);
+  rpc GetNotificationPreferences(GetNotificationPreferencesRequest) returns (GetNotificationPreferencesResponse);
+}

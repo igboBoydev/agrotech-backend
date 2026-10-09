@@ -1,0 +1,200 @@
+syntax = "proto3";
+
+import "users/kyc.proto";
+import "users/document.proto";
+
+package users;
+
+message GetFarmsRequest {
+  string user_id = 1;
+}
+
+message FarmerProfileRequest{
+  string user_id = 1;
+}
+
+message Farm {
+  string address = 1;
+  string lga = 2;
+  string state = 3;
+  string country = 4;
+  string land_size = 5;
+  bool is_lease = 6;
+  bool is_own_property = 7;
+  int32 lease_years = 8;
+  int32 num_of_employees =9;
+  repeated Employee employees = 10;
+  repeated string farm_pictures = 11;
+  repeated Document farm_documents = 12;
+  string plant_type = 13;
+  string plant_season_start_date = 14;
+  string plant_season_end_date = 15;
+  string farm_type = 16;
+}
+
+message AddFarmRequest {
+  string address = 1;
+  string lga = 2;
+  string state = 3;
+  string country = 4;
+  string land_size = 5;
+  bool is_lease = 6;
+  bool is_own_property = 7;
+  int32 lease_years = 8;
+  int32 num_of_employees =9;
+  repeated Employee employees = 10;
+  string user_id = 11;
+  string plant_type = 12;
+  string plant_season_start_date = 13;
+  string plant_season_end_date = 14;
+  string farm_type = 15;
+}
+
+message Farmer {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string contact_phone_number = 4;
+  string email = 5;
+  string mother_maiden_name = 6;
+  string middle_name = 7;
+  string date_of_birth = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  string rim_number = 11;
+  Kyc kyc = 12;
+  bool active = 13;
+  string rsm = 14;
+  string sector_code = 15;
+  string sex = 16;
+  string title = 17;
+  string alternate_phone_number = 18;
+  string nationality = 19;
+  string marital_status = 20;
+  string education = 21;
+  string name_of_spouse = 22;
+  string branch = 23;
+  string father_name  = 24;
+  string mother_name = 25;
+  bool use_alt_acc_num = 26;
+  bool sms_enabled = 27;
+  bool email_enabled = 28;
+  repeated Farm farms = 29;
+}
+
+message Employee {
+  string occupation = 1;
+  Farmer customer = 2;
+  string business_category = 3;
+  string employment_category = 4;
+  string start_date =5;
+  string end_date = 6;
+  string duration_of_employment = 7;
+  string employer_phone = 8;
+  string position =9;
+}
+
+message LinkedCustomer {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string contact_phone_number = 4;
+  string email = 5;
+  string mother_maiden_name = 6;
+  string middle_name = 7;
+  string date_of_birth = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  Kyc kyc = 11;
+  repeated Farmer linked_customers = 12;
+
+  string sector_code = 13;
+}
+
+message CreateFarmerRequest {
+  string first_name = 1;
+  string last_name = 2;
+  string dob = 3;
+  string home_address = 4;
+  string lga = 5;
+  string state = 6;
+  string country = 7;
+  string email = 8;
+  string phone = 9;
+  string password = 10;
+
+}
+
+message CorporateUserAddress {
+  string id = 1;
+
+  string company_address = 2;
+
+  string state = 3;
+
+  string city = 4;
+
+  string country = 5;
+
+  string primary_company_address = 6;
+
+  string primary_company_state = 7;
+
+  string primary_company_city = 8;
+
+  string primary_company_country = 9;
+
+  string address = 10;
+
+  string verification_status = 11;
+
+  string created_at = 12;
+
+  string updated_at = 13;
+
+  string primary_company_lga = 14;
+}
+
+message AddFarmerKycRequest {
+  string id = 1;
+  repeated Document documentsAndIdentity = 2;
+  CorporateUserAddress corporate_customer_address = 3;
+  string signature = 4;
+  string bvn = 5;
+  string tin = 6;
+  string passport_photograph = 7;
+  string kyc_level = 8;
+  string tier = 9;
+  bool tin_verified = 10;
+  string driving_license = 11;
+  string international_passport_number = 12;
+  string voters_card_number = 13;
+}
+
+message CreateFarmerResponse {
+  string code = 1;
+  string message = 2;
+}
+
+message AddFarmerKycResponse {
+  string code = 1;
+  string message = 2;
+}
+
+
+message GetFarmsResponse {
+  repeated Farm farms = 1;
+}
+
+
+message AddFarmResponse {
+  string code = 1;
+  string message = 2;
+}
+
+message FarmerProfileResponse{
+  Farmer farmerDetails = 1;
+}
+
+
+

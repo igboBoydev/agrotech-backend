@@ -1,0 +1,61 @@
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}?reWriteBatchedInserts=true
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}   # no fallback on purpose — prod must fail fast if this isn't injected via the platform's secret store
+    hikari:
+      maximumPoolSize: 20           # adjust per instance, keep < DB max connections / app instances
+      minimumIdle: 5
+      idleTimeout: 300000           # 5 minutes, less than Postgres wait_timeout
+      maxLifetime: 1700000          # ~28 minutes, less than Postgres wait_timeout
+      keepaliveTime: 240000         # 4 minutes heartbeat
+      connectionTimeout: 30000      # 30s to borrow from pool
+      leakDetectionThreshold: 60000 # log stacktrace if connection held > 60s
+  jpa:
+    hibernate:
+      ddl-auto: validate               # schema is managed by Flyway (src/main/resources/db/migration) — Hibernate only verifies, never mutates
+    open-in-view: false             # better for scalability
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50            # enable batching for inserts/updates
+        order_inserts: true
+        order_updates: true
+        format_sql: false
+  flyway:
+    enabled: true
+    # No baseline-on-migrate here (unlike application-local.yaml): a fresh prod DB has no
+    # pre-existing schema to adopt, so Flyway should just run V1__baseline.sql as a real
+    # migration from empty, not skip it.
+  application:
+    name: my-service
+app:
+  jwt:
+    secret: ${JWT_SECRET}   # no fallback on purpose — must be injected via the platform's secret store, never checked in
+    expiration-ms: ${JWT_EXPIRATION_MS:3600000}   # 1 hour
+    otp-expiration-ms: ${OTP_EXPIRATION_MS:600000}   # 10 minutes
+logging:
+  level:
+    root: INFO
+    com:
+      zaxxer:
+        hikari: INFO   # no DEBUG in prod — application-local.yaml's HikariConfig DEBUG logging is too verbose/leaks pool internals here
+grpc:
+  server:
+    port: ${GRPC_PORT:3030}   # ⚠️ dead config — see the matching comment in application-local.yaml;
+                              # the real property is spring.grpc.server.port, and gRPC actually rides
+                              # Tomcat's server.port via servlet mode regardless of this value.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized   # unlike local's "always" — no gRPC/HTTP auth is wired up yet, so don't leak DB/disk internals to unauthenticated callers
+  metrics:
+    enable:
+      all: true

@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package fintech;
+
+import "fintech/enum.proto";
+
+message LoanApplication {
+  string id = 1;
+  string farmer_id = 2;
+  double requested_amount = 3;
+  int32 term_months = 4;
+  string purpose = 5;
+  double interest_rate = 6;
+  LoanApplicationStatus status = 7;
+  string applied_at = 8;
+  string decided_at = 9;
+}
+
+message LoanRepayment {
+  string id = 1;
+  double amount = 2;
+  string paid_at = 3;
+}
+
+message LoanAccount {
+  string id = 1;
+  string application_id = 2;
+  string farmer_id = 3;
+  double principal_amount = 4;
+  double interest_rate = 5;
+  double outstanding_balance = 6;
+  LoanAccountStatus status = 7;
+  string disbursed_at = 8;
+  repeated LoanRepayment repayments = 9;
+}
+
+message ApplyForLoanRequest {
+  string farmer_id = 1;
+  double requested_amount = 2;
+  int32 term_months = 3;
+  string purpose = 4;
+}
+
+message ApplyForLoanResponse {
+  string code = 1;
+  string message = 2;
+  LoanApplication application = 3;
+}
+
+message ReviewLoanApplicationRequest {
+  string application_id = 1;
+  bool approve = 2;
+}
+
+message ReviewLoanApplicationResponse {
+  string code = 1;
+  string message = 2;
+  LoanAccount account = 3;
+}
+
+message RecordRepaymentRequest {
+  string loan_id = 1;
+  double amount = 2;
+}
+
+message RecordRepaymentResponse {
+  string code = 1;
+  string message = 2;
+  LoanAccount account = 3;
+}
+
+message GetLoanRequest {
+  string loan_id = 1;
+}
+
+message GetLoanResponse {
+  string code = 1;
+  string message = 2;
+  LoanAccount account = 3;
+}
+
+message GetLoansByFarmerRequest {
+  string farmer_id = 1;
+}
+
+message GetLoansByFarmerResponse {
+  repeated LoanAccount accounts = 1;
+}

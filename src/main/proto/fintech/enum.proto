@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package fintech;
+
+enum LoanApplicationStatus {
+  LOAN_APPLICATION_PENDING = 0;
+  LOAN_APPLICATION_APPROVED = 1;
+  LOAN_APPLICATION_REJECTED = 2;
+}
+
+enum LoanAccountStatus {
+  LOAN_ACTIVE = 0;
+  LOAN_COMPLETED = 1;
+  LOAN_DEFAULTED = 2;
+}
+
+enum PolicyStatus {
+  POLICY_ACTIVE = 0;
+  POLICY_EXPIRED = 1;
+  POLICY_CANCELLED = 2;
+}
+
+enum ClaimStatus {
+  CLAIM_FILED = 0;
+  CLAIM_APPROVED = 1;
+  CLAIM_REJECTED = 2;
+  CLAIM_PAID = 3;
+}
+
+enum ReferralStatus {
+  REFERRAL_PENDING = 0;
+  REFERRAL_ACCEPTED = 1;
+  REFERRAL_DECLINED = 2;
+  REFERRAL_PAID = 3;
+}
+
+enum CreditScoreBand {
+  POOR = 0;
+  FAIR = 1;
+  GOOD = 2;
+  VERY_GOOD = 3;
+  EXCELLENT = 4;
+}

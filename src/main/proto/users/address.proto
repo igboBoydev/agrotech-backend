@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+import "users/enum.proto";
+
+package users;
+
+message Address {
+  string id = 1;
+  string residential_address = 2;
+  string residency = 3;
+  string state_of_origin = 4;
+  string lga_of_origin = 5;
+  string city = 6;
+  string postal_code = 7;
+  string state = 8;
+  string country = 9;
+  VerificationStatus verification_status = 10;
+}

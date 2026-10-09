@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package users;
+
+import "users/business.proto";
+import "users/kyc.proto";
+import "users/products.proto";
+import "users/farmers.proto";
+
+import "google/protobuf/timestamp.proto";
+
+service UsersService {
+  rpc CreateFarmer(CreateFarmerRequest) returns (CreateFarmerResponse);
+  rpc CreateBusiness(CreateBusinessRequest) returns (CreateBusinessResponse);
+  rpc GetBusinessProfile(GetBusinessProfileRequest) returns (GetBusinessProfileResponse);
+  rpc AddFarmerKyc(AddFarmerKycRequest) returns (AddFarmerKycResponse);
+  rpc GetFarmerProfile(FarmerProfileRequest) returns (FarmerProfileResponse);
+  rpc AddFarm(AddFarmRequest) returns (AddFarmResponse);
+  rpc GetFarms(GetFarmsRequest) returns (GetFarmsResponse);
+  rpc CheckKYCStatus(KYCRequest) returns (KYCStatus);
+  rpc GetFarmProducts(GetProductsRequest) returns (GetProductsResponse);
+  rpc AddFarmProduct(AddFarmProductRequest) returns (AddFarmProductResponse);
+
+}

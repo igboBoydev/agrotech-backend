@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package aiml;
+
+message GetAgronomicAdviceRequest {
+  string crop_type = 1;
+  string growth_stage = 2;
+}
+
+message GetAgronomicAdviceResponse {
+  string code = 1;
+  string message = 2;
+  string advice = 3;
+}

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package telemetry;
+
+import "telemetry/sensor.proto";
+import "telemetry/gps.proto";
+import "telemetry/vegetation.proto";
+import "telemetry/summary.proto";
+
+service TelemetryService {
+  rpc RecordSensorReading(RecordSensorReadingRequest) returns (RecordSensorReadingResponse);
+  rpc GetSensorReadings(GetSensorReadingsRequest) returns (GetSensorReadingsResponse);
+  rpc GetLatestSensorReading(GetLatestSensorReadingRequest) returns (GetLatestSensorReadingResponse);
+
+  rpc RecordGpsLocation(RecordGpsLocationRequest) returns (RecordGpsLocationResponse);
+  rpc GetGpsHistory(GetGpsHistoryRequest) returns (GetGpsHistoryResponse);
+  rpc GetLatestGpsLocation(GetLatestGpsLocationRequest) returns (GetLatestGpsLocationResponse);
+
+  rpc RecordVegetationIndex(RecordVegetationIndexRequest) returns (RecordVegetationIndexResponse);
+  rpc GetVegetationHistory(GetVegetationHistoryRequest) returns (GetVegetationHistoryResponse);
+  rpc GetLatestVegetationIndex(GetLatestVegetationIndexRequest) returns (GetLatestVegetationIndexResponse);
+
+  rpc GetFarmTelemetrySummary(GetFarmTelemetrySummaryRequest) returns (GetFarmTelemetrySummaryResponse);
+}

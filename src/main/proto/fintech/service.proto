@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package fintech;
+
+import "fintech/loan.proto";
+import "fintech/insurance.proto";
+import "fintech/creditscore.proto";
+
+service FintechService {
+  rpc ApplyForLoan(ApplyForLoanRequest) returns (ApplyForLoanResponse);
+  rpc ReviewLoanApplication(ReviewLoanApplicationRequest) returns (ReviewLoanApplicationResponse);
+  rpc RecordRepayment(RecordRepaymentRequest) returns (RecordRepaymentResponse);
+  rpc GetLoan(GetLoanRequest) returns (GetLoanResponse);
+  rpc GetLoansByFarmer(GetLoansByFarmerRequest) returns (GetLoansByFarmerResponse);
+
+  rpc CreatePolicy(CreatePolicyRequest) returns (CreatePolicyResponse);
+  rpc FileClaim(FileClaimRequest) returns (FileClaimResponse);
+  rpc ReviewClaim(ReviewClaimRequest) returns (ReviewClaimResponse);
+  rpc GetPolicy(GetPolicyRequest) returns (GetPolicyResponse);
+  rpc GetPoliciesByFarmer(GetPoliciesByFarmerRequest) returns (GetPoliciesByFarmerResponse);
+
+  rpc ComputeCreditScore(ComputeCreditScoreRequest) returns (ComputeCreditScoreResponse);
+  rpc GetCreditScore(GetCreditScoreRequest) returns (GetCreditScoreResponse);
+  rpc ReferToMfb(ReferToMfbRequest) returns (ReferToMfbResponse);
+}

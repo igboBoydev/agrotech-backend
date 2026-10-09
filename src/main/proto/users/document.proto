@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+import "users/enum.proto";
+
+package users;
+
+message Document {
+  string id = 1;
+  string document_name = 2;
+  string expiration_date = 3;
+  string document_url = 4;
+  string document_number = 5;
+  string country_of_issuance = 6;
+  string date_of_issuance = 7;
+  string place_of_issuance = 8;
+  VerificationStatus verification_status = 9;
+  string created_at = 10;
+}

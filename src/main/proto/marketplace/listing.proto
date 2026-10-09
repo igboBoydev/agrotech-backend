@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package marketplace;
+
+import "marketplace/enum.proto";
+
+message MarketplaceListing {
+  string id = 1;
+  string product_id = 2;
+  string farmer_id = 3;
+  double price_per_unit = 4;
+  double quantity_available = 5;
+  ListingStatus status = 6;
+  string created_at = 7;
+}
+
+message CreateListingRequest {
+  string farmer_id = 1;
+  string product_id = 2;
+  double price_per_unit = 3;
+  double quantity_available = 4;
+}
+
+message CreateListingResponse {
+  string code = 1;
+  string message = 2;
+  MarketplaceListing listing = 3;
+}
+
+message GetListingRequest {
+  string listing_id = 1;
+}
+
+message GetListingResponse {
+  string code = 1;
+  string message = 2;
+  MarketplaceListing listing = 3;
+}
+
+message GetListingsBySellerRequest {
+  string farmer_id = 1;
+}
+
+message GetListingsBySellerResponse {
+  repeated MarketplaceListing listings = 1;
+}
+
+message GetActiveListingsRequest {
+}
+
+message GetActiveListingsResponse {
+  repeated MarketplaceListing listings = 1;
+}

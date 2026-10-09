@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package users;
+
+enum VerificationStatus {
+  NULL = 0;
+  PENDING = 1;
+  APPROVED = 2;
+  REJECTED = 3;
+}
+
+enum MARITAL_STATUS {
+  MARRIED = 0;
+  SINGLE = 1;
+  DIVORCED = 2;
+  WIDOW = 3;
+  WIDOWER = 4;
+}

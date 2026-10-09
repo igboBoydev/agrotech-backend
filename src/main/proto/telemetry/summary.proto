@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package telemetry;
+
+import "telemetry/sensor.proto";
+import "telemetry/gps.proto";
+import "telemetry/vegetation.proto";
+
+message FarmTelemetrySummary {
+  string farm_id = 1;
+  GpsLocation latest_gps = 2;
+  VegetationIndex latest_vegetation = 3;
+  repeated SensorReading latest_readings = 4;
+}
+
+message GetFarmTelemetrySummaryRequest {
+  string farm_id = 1;
+}
+
+message GetFarmTelemetrySummaryResponse {
+  string code = 1;
+  string message = 2;
+  FarmTelemetrySummary summary = 3;
+}

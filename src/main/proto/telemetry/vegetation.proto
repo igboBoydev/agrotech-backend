@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package telemetry;
+
+import "telemetry/enum.proto";
+
+message VegetationIndex {
+  string id = 1;
+  string farm_id = 2;
+  double ndvi_value = 3;
+  VegetationHealthBand health_band = 4;
+  DataSource source = 5;
+  string captured_at = 6;
+}
+
+message RecordVegetationIndexRequest {
+  string farm_id = 1;
+  double ndvi_value = 2;
+  DataSource source = 3;
+  string captured_at = 4;
+}
+
+message RecordVegetationIndexResponse {
+  string code = 1;
+  string message = 2;
+  VegetationIndex index = 3;
+}
+
+message GetVegetationHistoryRequest {
+  string farm_id = 1;
+}
+
+message GetVegetationHistoryResponse {
+  repeated VegetationIndex indices = 1;
+}
+
+message GetLatestVegetationIndexRequest {
+  string farm_id = 1;
+}
+
+message GetLatestVegetationIndexResponse {
+  string code = 1;
+  string message = 2;
+  VegetationIndex index = 3;
+}

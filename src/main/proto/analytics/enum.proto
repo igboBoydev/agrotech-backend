@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package analytics;
+
+enum SubscriptionTier {
+  TIER_AGRO_DEALER = 0;
+  TIER_FOOD_PROCESSOR = 1;
+  TIER_GOV_NGO = 2;
+}
+
+enum SubscriptionStatus {
+  SUBSCRIPTION_ACTIVE = 0;
+  SUBSCRIPTION_EXPIRED = 1;
+  SUBSCRIPTION_CANCELLED = 2;
+}

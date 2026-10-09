@@ -1,0 +1,152 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.wrapper { padding: 1rem 0; }
+.title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+.title-row h2 { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.1rem; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.card:hover { border-color: var(--color-border-secondary); }
+.card.active { border-color: var(--color-border-primary); }
+.card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.card-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; }
+.card-sub { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; }
+.badge-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 400; }
+.detail-box { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem 1.15rem; margin-top: 12px; border: 0.5px solid var(--color-border-tertiary); }
+.detail-box h3 { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 10px; }
+.detail-item { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+.detail-item .icon { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.metric-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.metric { background: var(--color-background-primary); border-radius: var(--border-radius-md); padding: .6rem .75rem; border: 0.5px solid var(--color-border-tertiary); }
+.metric-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 2px; }
+.metric-val { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.ask-btn { font-size: 12px; color: var(--color-text-info); background: none; border: 0.5px solid var(--color-border-info); border-radius: 20px; padding: 4px 12px; cursor: pointer; margin-top: 10px; }
+.ask-btn:hover { background: var(--color-background-info); }
+</style>
+<div class="wrapper">
+  <div class="title-row">
+    <h2>Agritech revenue model — click a stream to explore</h2>
+  </div>
+  <div class="grid" id="cards"></div>
+  <div class="detail-box" id="detail" style="display:none"></div>
+</div>
+<script>
+const streams = [
+  {
+    id: 0,
+    title: "Embedded financial services",
+    sub: "Biggest earner — closes the $117B financing gap",
+    color: "#1D9E75",
+    badge_bg: "#E1F5EE", badge_text: "#0F6E56",
+    badges: ["Input financing", "Crop insurance", "Microloans"],
+    metrics: [{ label: "Market gap", val: "$117B" }, { label: "Revenue type", val: "Interest + fees" }, { label: "Moat", val: "Farm data" }],
+    details: [
+      { icon: "#1D9E75", text: "Offer seeds and fertilizer on installment plans — farmers pay in tranches after harvest. You earn interest margin (12–30% annualised in Nigerian agri-lending)." },
+      { icon: "#1D9E75", text: "Partner with licensed insurers (AIICO, AXA Mansard) to bundle crop insurance per season. Earn 15–25% commission on each policy sold through the platform." },
+      { icon: "#1D9E75", text: "Use farm GPS boundaries, crop history, and input usage to generate alternative credit scores. Refer scored farmers to microfinance banks (LAPO, NIRSAL MFB) for referral fees of ₦3,000–₦10,000 per disbursed loan." }
+    ],
+    prompt: "How do I build a credit scoring model using farm data in Nigeria?"
+  },
+  {
+    id: 1,
+    title: "B2B data & analytics",
+    sub: "High-margin subscription — satellite + AI intelligence",
+    color: "#534AB7",
+    badge_bg: "#EEEDFE", badge_text: "#3C3489",
+    badges: ["Agro-dealers", "Food processors", "Gov/NGOs"],
+    metrics: [{ label: "Margin", val: "70–85%" }, { label: "Revenue type", val: "Subscription" }, { label: "Lock-in", val: "High" }],
+    details: [
+      { icon: "#534AB7", text: "Aggregate anonymised field data across your farmer base — crop type, acreage, input use, yield estimates. This is a real-time agricultural intelligence layer." },
+      { icon: "#534AB7", text: "Sell tiered subscriptions: agro-dealers (₦200K/yr) get regional demand forecasts; food processors (₦800K–₦2M/yr) get crop availability alerts and quality indices." },
+      { icon: "#534AB7", text: "Government ministries and development banks (USAID, World Bank) pay for aggregated food security dashboards. These procurement cycles are slow but contracts are large (₦5M–₦50M)." }
+    ],
+    prompt: "What agricultural datasets should I collect to build a B2B intelligence product?"
+  },
+  {
+    id: 2,
+    title: "Marketplace commission",
+    sub: "2–5% per transaction — direct farm-to-buyer",
+    color: "#BA7517",
+    badge_bg: "#FAEEDA", badge_text: "#633806",
+    badges: ["Food processors", "Supermarkets", "Exporters"],
+    metrics: [{ label: "Take rate", val: "2–5%" }, { label: "Nigeria loss", val: "40% harvest" }, { label: "GMV target", val: "₦500M+" }],
+    details: [
+      { icon: "#BA7517", text: "Connect verified farmers directly to offtakers: food processors (Dangote, Flour Mills), supermarkets (Shoprite, Spar), and agricultural exporters. Eliminate the multi-layer middlemen who currently take 30–50% margins." },
+      { icon: "#BA7517", text: "Escrow payments in-app until goods are confirmed received. This protects both sides and keeps money flowing through your platform — you can earn float income on escrowed funds." },
+      { icon: "#BA7517", text: "Offer logistics integration (GIG Logistics, Sendbox, Kobo360) to handle last-mile delivery. Optionally take a logistics commission on top of the transaction fee." }
+    ],
+    prompt: "How do I onboard large food processors as buyers on my agritech marketplace?"
+  },
+  {
+    id: 3,
+    title: "Freemium SaaS",
+    sub: "User growth engine — monetise top 15–20%",
+    color: "#D85A30",
+    badge_bg: "#FAECE7", badge_text: "#712B13",
+    badges: ["Free tier", "Premium ₦500–₦2K/mo", "Agri-advisories"],
+    metrics: [{ label: "Target base", val: "100K+ farmers" }, { label: "Conversion", val: "15–20%" }, { label: "ARPU/mo", val: "₦1,200" }],
+    details: [
+      { icon: "#D85A30", text: "Free tier: real-time weather alerts (FEWS NET data), commodity market prices (AFEX, Afrimash), and basic planting calendar. Low CAC because farmers share it via WhatsApp communities." },
+      { icon: "#D85A30", text: "Premium tier: AI-powered crop disease diagnosis via phone camera (use a fine-tuned vision model on PlantVillage data), personalised agronomic advice, priority buyer matching, and loan access gateway." },
+      { icon: "#D85A30", text: "At 100,000 active users and 17% premium conversion → 17,000 paying users × ₦1,200/month = ₦20.4M monthly recurring revenue from SaaS alone." }
+    ],
+    prompt: "What features should be in the free vs premium tier of my agritech app?"
+  }
+];
+
+let active = null;
+
+function render() {
+  const container = document.getElementById('cards');
+  container.innerHTML = streams.map(s => `
+    <div class="card ${active === s.id ? 'active' : ''}" onclick="toggle(${s.id})">
+      <div class="card-header">
+        <div class="dot" style="background:${s.color}"></div>
+        <div>
+          <div class="card-title">${s.title}</div>
+        </div>
+      </div>
+      <div class="card-sub">${s.sub}</div>
+      <div class="badge-row">
+        ${s.badges.map(b => `<span class="badge" style="background:${s.badge_bg};color:${s.badge_text}">${b}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  const detail = document.getElementById('detail');
+  if (active !== null) {
+    const s = streams[active];
+    detail.style.display = 'block';
+    detail.innerHTML = `
+      <h3 style="color:${s.color}">${s.title}</h3>
+      ${s.details.map(d => `
+        <div class="detail-item">
+          <div class="icon" style="background:${d.icon}"></div>
+          <span>${d.text}</span>
+        </div>
+      `).join('')}
+      <div class="metric-row">
+        ${s.metrics.map(m => `
+          <div class="metric">
+            <div class="metric-label">${m.label}</div>
+            <div class="metric-val">${m.val}</div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="ask-btn" onclick="sendPrompt('${s.prompt}')">${s.prompt} ↗</button>
+    `;
+  } else {
+    detail.style.display = 'none';
+  }
+}
+
+function toggle(id) {
+  active = active === id ? null : id;
+  render();
+}
+
+render();
+</script>

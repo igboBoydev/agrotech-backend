@@ -1,0 +1,93 @@
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:catalyst_users}?reWriteBatchedInserts=true
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:St3@dy911}   # ⚠️ rotate securely (e.g. Vault, KMS, Secret Manager)
+    hikari:
+      maximumPoolSize: 20           # adjust per instance, keep < DB max connections / app instances
+      minimumIdle: 5
+      idleTimeout: 300000           # 5 minutes, less than MySQL wait_timeout
+      maxLifetime: 1700000          # ~28 minutes, less than MySQL wait_timeout
+      keepaliveTime: 240000         # 4 minutes heartbeat
+      connectionTimeout: 30000      # 30s to borrow from pool
+      leakDetectionThreshold: 60000 # log stacktrace if connection held > 60s
+  jpa:
+    hibernate:
+      ddl-auto: validate               # schema is managed by Flyway (src/main/resources/db/migration) — Hibernate only verifies
+    open-in-view: false             # better for scalability
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50            # enable batching for inserts/updates
+        order_inserts: true
+        order_updates: true
+        format_sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true       # this DB already has the Phase 0-3 schema; treat V1 as already applied
+    baseline-version: 1
+  application:
+    name: my-service
+app:
+  jwt:
+    secret: ${JWT_SECRET:nMHeDprqjEeka19AS59pWP0NDBFNXdNqhr/9IUkIl18=}   # ⚠️ local-only, rotate securely for prod
+    expiration-ms: ${JWT_EXPIRATION_MS:3600000}   # 1 hour
+    otp-expiration-ms: ${OTP_EXPIRATION_MS:600000}   # 10 minutes
+logging:
+  level:
+    com:
+      zaxxer:
+        hikari: DEBUG
+rabbitmq:
+  addresses: ${RABBITMQ:amqp://jlejkgxk:riQORmFQSempssduRaItPwq0Hfm3fh-i@goose.rmq2.cloudamqp.com:5672/jlejkgxk}
+  listener:
+    simple:
+      retry:
+        enabled: true
+        initial-interval: 1
+        max-attempts: 6
+        max-interval: 10s
+        multiplier: 2
+grpc:
+  server:
+    port: 3030   # ⚠️ dead config — the real property is spring.grpc.server.port (note the "spring." prefix);
+                 # this key is silently unread. gRPC actually rides Tomcat's server.port via servlet mode
+                 # (spring.grpc.server.servlet.enabled defaults to true) — confirmed with grpcurl while
+                 # building envoy/envoy.yaml, which points at server.port for exactly this reason.
+  account:
+    transactions:
+      request:
+        port: ${TRANSACTION_PORT:9090}
+        url: ${TRANSACTION_URL:10.100.201.241} #85.210.141.88 # 10.100.201.241
+    setup:
+      request:
+        port: ${SETUP_PORT:50052}
+        url: ${SETUP_URL:10.108.183.242} #4.158.39.10 # 10.108.183.242 #
+    customer:
+      request:
+        port: ${CUSTOMER_PORT:50051}
+        url: ${CUSTOMER_URL:10.96.80.217} #85.210.124.37 #10.96.80.217 #
+    notification:
+      request:
+        port: ${NOTIFICATION_PORT:5672}
+        url: ${NOTIFICATION_URL:10.105.249.102} #10.105.249.102 #4.158.113.50 # 10.96.80.217 #
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always   # show DB, disk, ping, etc
+  metrics:
+    enable:
+      all: true
+
+
+
+
+
+

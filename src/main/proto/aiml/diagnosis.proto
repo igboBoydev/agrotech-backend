@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package aiml;
+
+import "aiml/enum.proto";
+
+message CropDiagnosis {
+  string id = 1;
+  string farm_id = 2;
+  string crop_type = 3;
+  repeated CropSymptom symptoms = 4;
+  string diagnosis_result = 5;
+  double confidence = 6;
+  string recommended_action = 7;
+  string created_at = 8;
+}
+
+message DiagnoseCropIssueRequest {
+  string farm_id = 1;
+  string crop_type = 2;
+  repeated CropSymptom symptoms = 3;
+}
+
+message DiagnoseCropIssueResponse {
+  string code = 1;
+  string message = 2;
+  CropDiagnosis diagnosis = 3;
+}
+
+message GetDiagnosisHistoryRequest {
+  string farm_id = 1;
+}
+
+message GetDiagnosisHistoryResponse {
+  repeated CropDiagnosis diagnoses = 1;
+}

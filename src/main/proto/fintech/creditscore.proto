@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package fintech;
+
+import "fintech/enum.proto";
+
+message CreditScoreRecord {
+  string id = 1;
+  string farmer_id = 2;
+  int32 score = 3;
+  CreditScoreBand band = 4;
+  string computed_at = 5;
+}
+
+message MfbReferral {
+  string id = 1;
+  string farmer_id = 2;
+  string mfb_name = 3;
+  double referral_fee = 4;
+  ReferralStatus status = 5;
+  string referred_at = 6;
+}
+
+message ComputeCreditScoreRequest {
+  string farmer_id = 1;
+}
+
+message ComputeCreditScoreResponse {
+  string code = 1;
+  string message = 2;
+  CreditScoreRecord score = 3;
+}
+
+message GetCreditScoreRequest {
+  string farmer_id = 1;
+}
+
+message GetCreditScoreResponse {
+  string code = 1;
+  string message = 2;
+  CreditScoreRecord score = 3;
+}
+
+message ReferToMfbRequest {
+  string farmer_id = 1;
+  string mfb_name = 2;
+}
+
+message ReferToMfbResponse {
+  string code = 1;
+  string message = 2;
+  MfbReferral referral = 3;
+}

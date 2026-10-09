@@ -1,0 +1,79 @@
+# FarmIQ — full local stack: Postgres + the Spring Boot backend + the gRPC-Web
+# gateway. Genuinely runnable end to end, not just the Envoy piece this file
+# used to contain (that version assumed the app was already running natively
+# on the host — it isn't anymore, the app is now containerized too via the
+# Dockerfile in this same directory).
+#
+# Setup:
+#   cp .env.example .env      # then edit DB_PASSWORD/JWT_SECRET for anything
+#                              # beyond your own machine — see .env.example
+#   docker compose up --build
+#
+# The app applies its own Flyway migrations against the fresh postgres
+# container on first boot (application-prod.yaml, no baseline-on-migrate —
+# a brand-new empty DB runs V1__baseline.sql for real, by design).
+#
+# Kubernetes: every env var here is already externalized through .env, which
+# is the point — DB_HOST/DB_PORT/DB_NAME/JWT_EXPIRATION_MS/OTP_EXPIRATION_MS/
+# SPRING_PROFILES_ACTIVE map to a ConfigMap, DB_USER/DB_PASSWORD/JWT_SECRET
+# map to a Secret. This file doesn't generate k8s manifests itself.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - farmiq-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_HOST: postgres          # always the compose service name — .env's DB_HOST is for
+                                  # reference/consistency with non-compose runs, not read here
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
+      OTP_EXPIRATION_MS: ${OTP_EXPIRATION_MS}
+      GRPC_PORT: ${GRPC_PORT}     # dead config, kept for consistency — see .env.example
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 5
+    ports:
+      - "8080:8080"   # direct access for debugging (grpcurl, actuator) — the mobile app
+                      # should go through envoy (8081), not this port directly
+
+  envoy:
+    image: envoyproxy/envoy:v1.39-latest
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "8081:8081"   # gRPC-Web gateway (TLS) — the mobile app connects here
+      - "9901:9901"   # Envoy admin/stats — do not expose beyond localhost in real use
+    volumes:
+      - ./envoy:/etc/envoy:ro
+    working_dir: /etc
+    # envoy.docker.yaml, not envoy.yaml — see that file's header for exactly why
+    # (upstream address + admin bind, both container-networking-specific).
+    command: ["envoy", "-c", "/etc/envoy/envoy.docker.yaml"]
+
+volumes:
+  farmiq-postgres-data:

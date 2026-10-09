@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package aiml;
+
+message YieldPrediction {
+  string id = 1;
+  string farm_id = 2;
+  string crop_type = 3;
+  double predicted_yield_tons = 4;
+  double health_multiplier_used = 5;
+  string computed_at = 6;
+}
+
+message PredictYieldRequest {
+  string farm_id = 1;
+}
+
+message PredictYieldResponse {
+  string code = 1;
+  string message = 2;
+  YieldPrediction prediction = 3;
+}
+
+message GetLatestYieldPredictionRequest {
+  string farm_id = 1;
+}
+
+message GetLatestYieldPredictionResponse {
+  string code = 1;
+  string message = 2;
+  YieldPrediction prediction = 3;
+}

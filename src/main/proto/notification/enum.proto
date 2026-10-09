@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package notification;
+
+enum RecipientType {
+  RECIPIENT_FARMER = 0;
+  RECIPIENT_BUSINESS = 1;
+  RECIPIENT_ADMIN = 2;
+}
+
+enum NotificationChannel {
+  CHANNEL_SMS = 0;
+  CHANNEL_PUSH = 1;
+  CHANNEL_WHATSAPP = 2;
+}
+
+enum NotificationStatus {
+  NOTIFICATION_PENDING = 0;
+  NOTIFICATION_SENT = 1;
+  NOTIFICATION_FAILED = 2;
+  NOTIFICATION_READ = 3;
+}

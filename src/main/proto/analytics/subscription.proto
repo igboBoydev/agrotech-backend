@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package analytics;
+
+import "analytics/enum.proto";
+
+message Subscription {
+  string id = 1;
+  string business_id = 2;
+  SubscriptionTier tier = 3;
+  double price = 4;
+  SubscriptionStatus status = 5;
+  string start_date = 6;
+  string end_date = 7;
+}
+
+message CreateSubscriptionRequest {
+  string business_id = 1;
+  SubscriptionTier tier = 2;
+}
+
+message CreateSubscriptionResponse {
+  string code = 1;
+  string message = 2;
+  Subscription subscription = 3;
+}
+
+message GetSubscriptionRequest {
+  string business_id = 1;
+}
+
+message GetSubscriptionResponse {
+  string code = 1;
+  string message = 2;
+  Subscription subscription = 3;
+}
+
+message CancelSubscriptionRequest {
+  string subscription_id = 1;
+}
+
+message CancelSubscriptionResponse {
+  string code = 1;
+  string message = 2;
+  Subscription subscription = 3;
+}

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package aiml;
+
+enum CropSymptom {
+  SYMPTOM_LEAF_DISCOLORATION = 0;
+  SYMPTOM_LEAF_SPOTS = 1;
+  SYMPTOM_WILTING = 2;
+  SYMPTOM_PEST_SIGHTED = 3;
+  SYMPTOM_STUNTED_GROWTH = 4;
+}

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package marketplace;
+
+import "marketplace/listing.proto";
+import "marketplace/order.proto";
+
+service MarketplaceService {
+  rpc CreateListing(CreateListingRequest) returns (CreateListingResponse);
+  rpc GetListing(GetListingRequest) returns (GetListingResponse);
+  rpc GetListingsBySeller(GetListingsBySellerRequest) returns (GetListingsBySellerResponse);
+  rpc GetActiveListings(GetActiveListingsRequest) returns (GetActiveListingsResponse);
+
+  rpc PlaceOrder(PlaceOrderRequest) returns (PlaceOrderResponse);
+  rpc ConfirmOrder(ConfirmOrderRequest) returns (ConfirmOrderResponse);
+  rpc CompleteOrder(CompleteOrderRequest) returns (CompleteOrderResponse);
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  rpc GetOrdersByBuyer(GetOrdersByBuyerRequest) returns (GetOrdersByBuyerResponse);
+  rpc GetOrdersBySeller(GetOrdersBySellerRequest) returns (GetOrdersBySellerResponse);
+}

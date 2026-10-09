@@ -1,0 +1,227 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.tab { padding: 6px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); font-size: 13px; cursor: pointer; background: var(--color-background-primary); color: var(--color-text-secondary); }
+.tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); font-weight: 500; border-color: var(--color-border-primary); }
+.svc { display: none; }
+.svc.active { display: block; }
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px; margin-right: 4px; }
+.get  { background: #E6F1FB; color: #0C447C; }
+.post { background: #EAF3DE; color: #27500A; }
+.put  { background: #FAEEDA; color: #633806; }
+.del  { background: #FCEBEB; color: #791F1F; }
+.grpc { background: #E1F5EE; color: #085041; }
+.row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.row:last-child { border-bottom: none; }
+.path { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); flex: 1; }
+.desc { font-size: 12px; color: var(--color-text-secondary); min-width: 180px; }
+.section-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .05em; margin: 1rem 0 .5rem; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+.svc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+.svc-name { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+.lang-badge { font-size: 11px; padding: 3px 10px; border-radius: var(--border-radius-md); }
+.java  { background: #EEEDFE; color: #3C3489; }
+.go    { background: #E1F5EE; color: #085041; }
+.node  { background: #EAF3DE; color: #27500A; }
+.python{ background: #FAEEDA; color: #633806; }
+</style>
+
+<div style="padding: 1rem 0;">
+<h2 class="sr-only">FarmIQ API specification for all microservices</h2>
+<div class="tabs">
+  <div class="tab active" onclick="sw('auth')">Auth</div>
+  <div class="tab" onclick="sw('fintech')">Fintech</div>
+  <div class="tab" onclick="sw('market')">Marketplace</div>
+  <div class="tab" onclick="sw('telem')">Telemetry</div>
+  <div class="tab" onclick="sw('notify')">Notification</div>
+  <div class="tab" onclick="sw('ml')">AI / ML</div>
+  <div class="tab" onclick="sw('b2b')">B2B analytics</div>
+</div>
+
+<!-- AUTH -->
+<div class="svc active" id="svc-auth">
+  <div class="card">
+    <div class="svc-header">
+      <span class="svc-name">Auth & user service</span>
+      <span class="lang-badge java">Java</span>
+      <span style="font-size:12px;color:var(--color-text-secondary)">port 8080 · PostgreSQL · REST + gRPC</span>
+    </div>
+    <div class="section-title">REST endpoints</div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/auth/register</span><span class="desc">Farmer/buyer registration + KYC upload</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/auth/login</span><span class="desc">Email or phone + password → JWT</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/auth/refresh</span><span class="desc">Refresh access token</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/auth/logout</span><span class="desc">Revoke refresh token</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/users/{userId}</span><span class="desc">Get farmer profile</span></div>
+    <div class="row"><span class="badge put">PUT</span><span class="path">/api/v1/users/{userId}</span><span class="desc">Update profile (location, crops)</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/auth/kyc/verify</span><span class="desc">Submit NIN / BVN for verification</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/auth/kyc/status/{userId}</span><span class="desc">Check KYC status</span></div>
+    <div class="section-title">gRPC methods (proto: auth.proto)</div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">ValidateToken(TokenRequest) → TokenResponse</span><span class="desc">Called by gateway on every request</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetUserProfile(UserRequest) → UserProfile</span><span class="desc">Internal profile fetch by Fintech/Marketplace</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">CheckKYCStatus(KYCRequest) → KYCStatus</span><span class="desc">Fintech checks before issuing loan</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetUserRoles(UserRequest) → RolesResponse</span><span class="desc">Authorization — farmer vs buyer vs admin</span></div>
+  </div>
+</div>
+
+<!-- FINTECH -->
+<div class="svc" id="svc-fintech">
+  <div class="card">
+    <div class="svc-header">
+      <span class="svc-name">Fintech service</span>
+      <span class="lang-badge java">Java</span>
+      <span style="font-size:12px;color:var(--color-text-secondary)">port 8081 · PostgreSQL · REST + gRPC</span>
+    </div>
+    <div class="section-title">REST endpoints</div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/loans/apply</span><span class="desc">Farmer submits loan application</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/loans/{loanId}</span><span class="desc">Loan details + status</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/loans/farmer/{farmerId}</span><span class="desc">All loans for a farmer</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/loans/{loanId}/repay</span><span class="desc">Record repayment via Paystack</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/insurance/subscribe</span><span class="desc">Enroll in crop insurance policy</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/insurance/{policyId}</span><span class="desc">Policy details + coverage</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/insurance/claim</span><span class="desc">Submit insurance claim</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/wallet/{farmerId}</span><span class="desc">Wallet balance + transactions</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/wallet/withdraw</span><span class="desc">Withdraw to bank account</span></div>
+    <div class="section-title">gRPC methods (proto: fintech.proto)</div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetFarmScore(FarmerRequest) → CreditScore</span><span class="desc">ML service queries credit score</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">HoldEscrow(EscrowRequest) → EscrowResponse</span><span class="desc">Marketplace locks funds pre-delivery</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">ReleaseEscrow(EscrowId) → TransactionResult</span><span class="desc">Marketplace releases on delivery confirm</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetWalletBalance(FarmerRequest) → BalanceResponse</span><span class="desc">Gateway / Marketplace checks balance</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">IssueLoan(LoanRequest) → LoanResponse</span><span class="desc">Internal auto-approve after ML score</span></div>
+  </div>
+</div>
+
+<!-- MARKETPLACE -->
+<div class="svc" id="svc-market">
+  <div class="card">
+    <div class="svc-header">
+      <span class="svc-name">Marketplace service</span>
+      <span class="lang-badge go">Go</span>
+      <span style="font-size:12px;color:var(--color-text-secondary)">port 8082 · PostgreSQL + Redis · gRPC</span>
+    </div>
+    <div class="section-title">REST endpoints (via gateway translation)</div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/listings</span><span class="desc">Farmer creates crop listing</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/listings</span><span class="desc">Browse listings (filter: crop, location, price)</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/listings/{listingId}</span><span class="desc">Single listing detail</span></div>
+    <div class="row"><span class="badge put">PUT</span><span class="path">/api/v1/listings/{listingId}</span><span class="desc">Update price/quantity</span></div>
+    <div class="row"><span class="badge del">DEL</span><span class="path">/api/v1/listings/{listingId}</span><span class="desc">Remove listing</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/orders</span><span class="desc">Buyer places order + triggers escrow</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/orders/{orderId}</span><span class="desc">Order status + tracking</span></div>
+    <div class="row"><span class="badge put">PUT</span><span class="path">/api/v1/orders/{orderId}/confirm</span><span class="desc">Buyer confirms delivery → releases escrow</span></div>
+    <div class="section-title">gRPC methods (proto: marketplace.proto)</div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">MatchFarmerToBuyer(MatchRequest) → MatchResponse</span><span class="desc">AI-assisted matching engine</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetActiveListing(ListingRequest) → Listing</span><span class="desc">Fintech checks crop volume for loan</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">UpdateOrderStatus(StatusUpdate) → StatusResponse</span><span class="desc">Notification service triggers alerts</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetMarketPrices(CropRequest) → PriceList</span><span class="desc">ML / B2B analytics queries live prices</span></div>
+  </div>
+</div>
+
+<!-- TELEMETRY -->
+<div class="svc" id="svc-telem">
+  <div class="card">
+    <div class="svc-header">
+      <span class="svc-name">Farm telemetry service</span>
+      <span class="lang-badge go">Go</span>
+      <span style="font-size:12px;color:var(--color-text-secondary)">port 8083 · TimescaleDB · gRPC + Kafka producer</span>
+    </div>
+    <div class="section-title">REST endpoints (via gateway)</div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/farms</span><span class="desc">Register farm (GPS boundary, crop type)</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/farms/{farmId}</span><span class="desc">Farm details + last sensor reading</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/farms/{farmId}/telemetry</span><span class="desc">Historical sensor data (date range)</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/farms/{farmId}/sensor</span><span class="desc">IoT device pushes soil/weather reading</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/weather/{lat}/{lon}</span><span class="desc">Forecast + NDVI for location</span></div>
+    <div class="section-title">gRPC methods (proto: telemetry.proto)</div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">IngestSensorData(SensorBatch) → IngestResponse</span><span class="desc">IoT devices stream data in batches</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetFarmSnapshot(FarmRequest) → FarmSnapshot</span><span class="desc">ML service pulls latest readings</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetNDVIIndex(FarmRequest) → NDVIResponse</span><span class="desc">Satellite health index per farm</span></div>
+    <div class="row"><span class="badge grpc">StreamRPC</span><span class="path">StreamFarmEvents(FarmRequest) → stream FarmEvent</span><span class="desc">Server-streaming: live GPS + alerts</span></div>
+    <div class="section-title">Kafka topics published</div>
+    <div class="row"><span class="badge grpc">PUB</span><span class="path">farm-events</span><span class="desc">Consumed by ML service + B2B analytics</span></div>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="svc" id="svc-notify">
+  <div class="card">
+    <div class="svc-header">
+      <span class="svc-name">Notification service</span>
+      <span class="lang-badge node">Node.js</span>
+      <span style="font-size:12px;color:var(--color-text-secondary)">port 8084 · Redis queues · REST + Kafka consumer</span>
+    </div>
+    <div class="section-title">REST endpoints</div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/notify/sms</span><span class="desc">Send SMS via Termii</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/notify/push</span><span class="desc">Firebase push notification</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/notify/whatsapp</span><span class="desc">WhatsApp message via Africa's Talking</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/notify/ussd</span><span class="desc">USSD session message (Hausa/Yoruba/Igbo)</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/notify/logs/{userId}</span><span class="desc">Notification history for user</span></div>
+    <div class="row"><span class="badge put">PUT</span><span class="path">/api/v1/notify/preferences/{userId}</span><span class="desc">User sets preferred channel</span></div>
+    <div class="section-title">Kafka topics consumed</div>
+    <div class="row"><span class="badge del">SUB</span><span class="path">notification-events</span><span class="desc">All services publish here to trigger alerts</span></div>
+    <div class="row"><span class="badge del">SUB</span><span class="path">payment-events</span><span class="desc">Loan approval, repayment, payout alerts</span></div>
+    <div class="section-title">gRPC methods (proto: notify.proto)</div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">SendAlert(AlertRequest) → AlertResponse</span><span class="desc">Synchronous urgent alerts (e.g. disease detected)</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">BroadcastToCooperative(BroadcastRequest) → BroadcastResponse</span><span class="desc">Mass message to cooperative members</span></div>
+  </div>
+</div>
+
+<!-- ML -->
+<div class="svc" id="svc-ml">
+  <div class="card">
+    <div class="svc-header">
+      <span class="svc-name">AI / ML service</span>
+      <span class="lang-badge python">Python</span>
+      <span style="font-size:12px;color:var(--color-text-secondary)">port 8085 · MongoDB · gRPC + Kafka consumer</span>
+    </div>
+    <div class="section-title">REST endpoints (via gateway)</div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/ml/diagnose</span><span class="desc">Upload crop photo → disease diagnosis</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/ml/yield-predict</span><span class="desc">Predict yield given farm + weather data</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/ml/planting-calendar/{farmId}</span><span class="desc">AI-personalized planting schedule</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/ml/credit-score/{farmerId}</span><span class="desc">AI credit score from farm history</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/ml/price-forecast</span><span class="desc">Predict market price for crop + region</span></div>
+    <div class="section-title">gRPC methods (proto: ml.proto)</div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">DiagnoseCrop(ImageRequest) → DiagnosisResult</span><span class="desc">Fintech + mobile app calls synchronously</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">ScoreFarmerCredit(FarmerData) → CreditScore</span><span class="desc">Fintech calls before issuing loan</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">PredictYield(FarmSnapshot) → YieldPrediction</span><span class="desc">Insurance service uses for premium pricing</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetPlantingAdvice(FarmRequest) → PlantingPlan</span><span class="desc">Mobile app requests personalized calendar</span></div>
+    <div class="section-title">Kafka topics consumed</div>
+    <div class="row"><span class="badge del">SUB</span><span class="path">farm-events</span><span class="desc">Auto-trigger model re-scoring on new sensor data</span></div>
+  </div>
+</div>
+
+<!-- B2B -->
+<div class="svc" id="svc-b2b">
+  <div class="card">
+    <div class="svc-header">
+      <span class="svc-name">B2B analytics service</span>
+      <span class="lang-badge node">Node.js</span>
+      <span style="font-size:12px;color:var(--color-text-secondary)">port 8086 · PostgreSQL · REST + Kafka consumer</span>
+    </div>
+    <div class="section-title">REST endpoints</div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/analytics/supply-forecast</span><span class="desc">Regional crop supply by type + period</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/analytics/price-index</span><span class="desc">Market price index by crop + state</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/analytics/farmer-segments</span><span class="desc">Anonymized farmer profiles by region</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/analytics/yield-trends</span><span class="desc">Historical + predicted yield trends</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/analytics/report</span><span class="desc">Custom report generation for NGOs/gov</span></div>
+    <div class="row"><span class="badge post">POST</span><span class="path">/api/v1/analytics/subscribe</span><span class="desc">B2B client subscribes to data feed</span></div>
+    <div class="row"><span class="badge get">GET</span><span class="path">/api/v1/analytics/dashboard/{clientId}</span><span class="desc">Aggregated KPIs for subscribed client</span></div>
+    <div class="section-title">Kafka topics consumed</div>
+    <div class="row"><span class="badge del">SUB</span><span class="path">farm-events</span><span class="desc">Builds supply + yield intelligence</span></div>
+    <div class="row"><span class="badge del">SUB</span><span class="path">payment-events</span><span class="desc">Transaction volume + repayment analytics</span></div>
+    <div class="section-title">gRPC methods (proto: analytics.proto)</div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetAggregatedSupply(SupplyRequest) → SupplyReport</span><span class="desc">Internal: Marketplace uses for bulk pricing</span></div>
+    <div class="row"><span class="badge grpc">RPC</span><span class="path">GetRegionalPriceIndex(RegionRequest) → PriceIndex</span><span class="desc">ML service uses for price forecasting</span></div>
+  </div>
+</div>
+
+</div>
+<script>
+function sw(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const n = ['auth','fintech','market','telem','notify','ml','b2b'][i];
+    t.classList.toggle('active', n === name);
+  });
+  document.querySelectorAll('.svc').forEach(s => {
+    s.classList.toggle('active', s.id === 'svc-' + name);
+  });
+}
+</script>

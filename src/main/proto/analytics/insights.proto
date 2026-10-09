@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package analytics;
+
+message GetRegionalCropSummaryRequest {
+  string business_id = 1;
+  string state = 2;
+  string plant_type = 3;
+}
+
+message GetRegionalCropSummaryResponse {
+  string code = 1;
+  string message = 2;
+  int32 farm_count = 3;
+  double total_quantity_listed = 4;
+  double average_price_per_unit = 5;
+}
+
+message GetMarketplaceActivitySummaryRequest {
+  string business_id = 1;
+}
+
+message GetMarketplaceActivitySummaryResponse {
+  string code = 1;
+  string message = 2;
+  int32 completed_order_count = 3;
+  double gross_merchandise_value = 4;
+  double average_order_value = 5;
+}
+
+message GetFoodSecurityIndicatorsRequest {
+  string business_id = 1;
+  string state = 2;
+}
+
+message VegetationHealthBandCount {
+  string band = 1;
+  int32 count = 2;
+}
+
+message GetFoodSecurityIndicatorsResponse {
+  string code = 1;
+  string message = 2;
+  int32 farm_count = 3;
+  repeated VegetationHealthBandCount vegetation_health_distribution = 4;
+}

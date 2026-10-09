@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package auth;
+
+import "google/protobuf/timestamp.proto";
+
+service AuthDataService {
+  rpc GenerateToken(GenerateTokenRequest) returns (GenerateTokenResponse);
+  rpc ValidateToken(TokenRequest) returns (TokenResponse);
+  rpc ValidateEmail(ValidateEmailRequest) returns (ValidateEmailResponse);
+  rpc ValidatePhone(ValidatePhoneRequest) returns (ValidatePhoneResponse);
+  rpc ChangeFarmerPassword(ChangeFarmerPasswordRequest) returns (ChangeFarmerPasswordResponse);
+  rpc FarmerLogin(FarmerLoginRequest) returns (FarmerLoginResponse);
+}
+
+message FarmerLoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message ChangeFarmerPasswordRequest {
+  string password = 1;
+}
+
+message ValidateEmailRequest {
+  string email = 1;
+}
+
+message ValidatePhoneRequest {
+  string phone = 1;
+}
+
+message ValidateTokenRequest {
+  string email_token = 1;
+}
+
+message ValidateTokenPhoneRequest {
+  string phone_token = 1;
+}
+
+message GenerateTokenRequest{
+  string email = 1;
+}
+
+message TokenRequest{
+  string token = 1;
+  ValidateType validateType = 2;
+}
+
+message CreateRoleRequest {
+
+}
+
+message CreateRoleResponse {
+
+}
+
+
+message GenerateTokenResponse {
+  string token = 1;
+  string refresh_token = 2;
+}
+
+
+message TokenResponse{
+  string message = 1;
+  string code = 2;
+}
+
+message ValidateEmailResponse {
+  string message = 1;
+  string code = 2;
+}
+
+message ValidatePhoneResponse {
+  string message = 1;
+  string code = 2;
+}
+
+message ValidateEmailTokenResponse {
+  string message = 1;
+  string code = 2;
+}
+
+message ValidatePhoneTokenResponse {
+  string message = 1;
+  string code = 2;
+}
+
+message ChangeFarmerPasswordResponse {
+  string message = 1;
+  string code = 2;
+}
+
+message FarmerLoginResponse {
+  string token = 1;
+  string message = 2;
+  string code = 3;
+}
+
+enum ValidateType {
+  PHONE = 0;
+  EMAIL = 1;
+  LOGIN = 2;
+}

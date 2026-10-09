@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package telemetry;
+
+message GpsLocation {
+  string id = 1;
+  string farm_id = 2;
+  double latitude = 3;
+  double longitude = 4;
+  double accuracy_meters = 5;
+  string recorded_at = 6;
+}
+
+message RecordGpsLocationRequest {
+  string farm_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  double accuracy_meters = 4;
+  string recorded_at = 5;
+}
+
+message RecordGpsLocationResponse {
+  string code = 1;
+  string message = 2;
+  GpsLocation location = 3;
+}
+
+message GetGpsHistoryRequest {
+  string farm_id = 1;
+}
+
+message GetGpsHistoryResponse {
+  repeated GpsLocation locations = 1;
+}
+
+message GetLatestGpsLocationRequest {
+  string farm_id = 1;
+}
+
+message GetLatestGpsLocationResponse {
+  string code = 1;
+  string message = 2;
+  GpsLocation location = 3;
+}

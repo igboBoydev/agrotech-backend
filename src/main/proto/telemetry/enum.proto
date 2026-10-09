@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package telemetry;
+
+enum SensorType {
+  SENSOR_SOIL_MOISTURE = 0;
+  SENSOR_TEMPERATURE = 1;
+  SENSOR_HUMIDITY = 2;
+  SENSOR_RAINFALL = 3;
+}
+
+enum DataSource {
+  SOURCE_SENSOR = 0;
+  SOURCE_SATELLITE = 1;
+  SOURCE_MANUAL = 2;
+}
+
+enum VegetationHealthBand {
+  VEGETATION_POOR = 0;
+  VEGETATION_MODERATE = 1;
+  VEGETATION_GOOD = 2;
+  VEGETATION_EXCELLENT = 3;
+}

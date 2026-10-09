@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package aiml;
+
+import "aiml/diagnosis.proto";
+import "aiml/yield.proto";
+import "aiml/advisory.proto";
+
+service AiMlService {
+  rpc DiagnoseCropIssue(DiagnoseCropIssueRequest) returns (DiagnoseCropIssueResponse);
+  rpc GetDiagnosisHistory(GetDiagnosisHistoryRequest) returns (GetDiagnosisHistoryResponse);
+
+  rpc PredictYield(PredictYieldRequest) returns (PredictYieldResponse);
+  rpc GetLatestYieldPrediction(GetLatestYieldPredictionRequest) returns (GetLatestYieldPredictionResponse);
+
+  rpc GetAgronomicAdvice(GetAgronomicAdviceRequest) returns (GetAgronomicAdviceResponse);
+}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package analytics;
+
+import "analytics/subscription.proto";
+import "analytics/insights.proto";
+
+service AnalyticsService {
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (CreateSubscriptionResponse);
+  rpc GetSubscription(GetSubscriptionRequest) returns (GetSubscriptionResponse);
+  rpc CancelSubscription(CancelSubscriptionRequest) returns (CancelSubscriptionResponse);
+
+  rpc GetRegionalCropSummary(GetRegionalCropSummaryRequest) returns (GetRegionalCropSummaryResponse);
+  rpc GetMarketplaceActivitySummary(GetMarketplaceActivitySummaryRequest) returns (GetMarketplaceActivitySummaryResponse);
+  rpc GetFoodSecurityIndicators(GetFoodSecurityIndicatorsRequest) returns (GetFoodSecurityIndicatorsResponse);
+}

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package notification;
+
+message NotificationPreference {
+  string recipient_id = 1;
+  bool sms_enabled = 2;
+  bool push_enabled = 3;
+  bool whatsapp_enabled = 4;
+}
+
+message SetNotificationPreferencesRequest {
+  string recipient_id = 1;
+  bool sms_enabled = 2;
+  bool push_enabled = 3;
+  bool whatsapp_enabled = 4;
+}
+
+message SetNotificationPreferencesResponse {
+  string code = 1;
+  string message = 2;
+  NotificationPreference preference = 3;
+}
+
+message GetNotificationPreferencesRequest {
+  string recipient_id = 1;
+}
+
+message GetNotificationPreferencesResponse {
+  string code = 1;
+  string message = 2;
+  NotificationPreference preference = 3;
+}

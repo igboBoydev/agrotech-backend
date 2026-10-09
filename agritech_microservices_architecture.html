@@ -1,0 +1,215 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.wrap { padding: 1rem 0; font-family: var(--font-sans); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.leg { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.layer { margin-bottom: 10px; }
+.layer-label { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; padding-left: 2px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.svc { flex: 1; min-width: 130px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 10px 12px; cursor: pointer; transition: border-color .15s; position: relative; }
+.svc:hover { border-color: var(--color-border-secondary); }
+.svc.active { border-width: 1.5px; }
+.svc-lang { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 8px; display: inline-block; margin-bottom: 6px; }
+.svc-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+.svc-desc { font-size: 11px; color: var(--color-text-secondary); line-height: 1.4; }
+.infra { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 10px 14px; margin-bottom: 10px; }
+.infra-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 6px; }
+.infra-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.infra-chip { font-size: 11px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 6px; padding: 3px 10px; color: var(--color-text-secondary); }
+.detail { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 14px 16px; margin-top: 10px; }
+.detail-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 10px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.detail-cell { background: var(--color-background-primary); border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); padding: 8px 10px; }
+.detail-cell-label { font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .05em; }
+.detail-cell-val { font-size: 12px; color: var(--color-text-primary); line-height: 1.4; }
+.deps { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+.ask-btn { font-size: 11px; color: var(--color-text-info); background: none; border: 0.5px solid var(--color-border-info); border-radius: 20px; padding: 4px 12px; cursor: pointer; margin-top: 10px; }
+.ask-btn:hover { background: var(--color-background-info); }
+</style>
+<div class="wrap">
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:#534AB7"></div>Java + Spring Boot</div>
+    <div class="leg"><div class="leg-dot" style="background:#1D9E75"></div>Go + Gin</div>
+    <div class="leg"><div class="leg-dot" style="background:#BA7517"></div>Node.js + TypeScript</div>
+    <div class="leg"><div class="leg-dot" style="background:#D85A30"></div>Python + FastAPI</div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-label">Client layer</div>
+    <div class="row">
+      <div class="svc" style="border-color:#888780">
+        <span class="svc-lang" style="background:#F1EFE8;color:#444441">React Native</span>
+        <div class="svc-name">Mobile app</div>
+        <div class="svc-desc">Android + iOS, SQLite offline, syncs on reconnect</div>
+      </div>
+      <div class="svc" style="border-color:#888780">
+        <span class="svc-lang" style="background:#F1EFE8;color:#444441">API Gateway</span>
+        <div class="svc-name">Kong / AWS API GW</div>
+        <div class="svc-desc">Auth, rate limiting, routing to all services</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-label">Core domain services — click to explore</div>
+    <div class="row" id="svc-row"></div>
+  </div>
+
+  <div id="detail-box"></div>
+
+  <div class="layer" style="margin-top:10px">
+    <div class="layer-label">Shared infrastructure</div>
+    <div class="infra">
+      <div class="infra-title">Message broker</div>
+      <div class="infra-row">
+        <div class="infra-chip">Apache Kafka</div>
+        <div class="infra-chip">Async events between services</div>
+        <div class="infra-chip">Farm data ingestion stream</div>
+        <div class="infra-chip">Loan/payment events</div>
+      </div>
+    </div>
+    <div class="infra">
+      <div class="infra-title">Databases (each service owns its own)</div>
+      <div class="infra-row">
+        <div class="infra-chip">PostgreSQL — Java, Node</div>
+        <div class="infra-chip">Redis — Go (caching)</div>
+        <div class="infra-chip">TimescaleDB — Go (telemetry)</div>
+        <div class="infra-chip">MongoDB — Python (ML results)</div>
+      </div>
+    </div>
+    <div class="infra" style="margin-bottom:0">
+      <div class="infra-title">Observability + deployment</div>
+      <div class="infra-row">
+        <div class="infra-chip">Docker + Kubernetes (EKS)</div>
+        <div class="infra-chip">Prometheus + Grafana</div>
+        <div class="infra-chip">AWS Africa (Cape Town)</div>
+        <div class="infra-chip">gRPC inter-service</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const services = [
+  {
+    id: "auth",
+    lang: "Java", color: "#534AB7", bg: "#EEEDFE", textColor: "#3C3489",
+    name: "Auth & user service",
+    desc: "Identity, roles, farmer profiles",
+    why: "Spring Security, JWT, OAuth2 are battle-tested. Farmer onboarding flows are complex multi-step forms with KYC verification — Spring's rich ecosystem handles this well.",
+    db: "PostgreSQL", port: "8080", proto: "REST + gRPC",
+    deps: "Talks to: Marketplace, Fintech, Notification services",
+    libs: "Spring Security, Spring Data JPA, Keycloak adapter",
+    prompt: "How do I implement farmer KYC verification in Spring Boot?"
+  },
+  {
+    id: "fintech",
+    lang: "Java", color: "#534AB7", bg: "#EEEDFE", textColor: "#3C3489",
+    name: "Fintech service",
+    desc: "Loans, insurance, credit scoring",
+    why: "Financial transactions demand ACID compliance, rigorous transaction management, and auditability. Spring Boot + JPA gives you declarative transactions, rollback, and a mature ecosystem for financial integrations (Flutterwave, Paystack SDKs).",
+    db: "PostgreSQL", port: "8081", proto: "REST + gRPC",
+    deps: "Talks to: AI/ML service (credit score), Marketplace (escrow), Paystack/Flutterwave APIs",
+    libs: "Spring Data JPA, Spring Transactions, Paystack Java SDK",
+    prompt: "How do I build a credit score engine using farm data in Spring Boot?"
+  },
+  {
+    id: "marketplace",
+    lang: "Go", color: "#1D9E75", bg: "#E1F5EE", textColor: "#085041",
+    name: "Marketplace service",
+    desc: "Listings, matching, transactions",
+    why: "Marketplace matching is a high-concurrency problem — hundreds of buyers querying thousands of farm listings simultaneously. Go's goroutines handle this with minimal memory overhead. Sub-millisecond matching latency is achievable.",
+    db: "PostgreSQL + Redis", port: "8082", proto: "gRPC",
+    deps: "Talks to: Auth service, Fintech service (escrow), Notification service",
+    libs: "Gin, GORM, go-redis, pgx",
+    prompt: "How do I build a high-concurrency farm-to-buyer matching engine in Go?"
+  },
+  {
+    id: "telemetry",
+    lang: "Go", color: "#1D9E75", bg: "#E1F5EE", textColor: "#085041",
+    name: "Farm telemetry service",
+    desc: "GPS, sensor, satellite ingestion",
+    why: "Real-time farm data ingestion is a classic high-throughput stream processing problem — thousands of farms pinging data concurrently. Go is the best choice here: low latency, tiny memory footprint, and native concurrency primitives.",
+    db: "TimescaleDB (time-series)", port: "8083", proto: "gRPC + Kafka consumer",
+    deps: "Publishes to: Kafka (farm-events topic). Consumed by: AI/ML service, Analytics service",
+    libs: "Gin, pgx/TimescaleDB driver, Sarama (Kafka)",
+    prompt: "How do I ingest real-time farm GPS and NDVI data efficiently in Go?"
+  },
+  {
+    id: "notification",
+    lang: "Node.js", color: "#BA7517", bg: "#FAEEDA", textColor: "#633806",
+    name: "Notification service",
+    desc: "SMS, push, WhatsApp alerts",
+    why: "Notification delivery is I/O-bound — waiting on Termii, Africa's Talking, or Firebase to respond. Node.js's event loop is perfectly designed for this: fire thousands of async notification requests without blocking. Fast to build, easy to iterate.",
+    db: "Redis (queues)", port: "8084", proto: "REST + Kafka consumer",
+    deps: "Consumed by: all services via Kafka (notification-events topic)",
+    libs: "Express/Fastify, BullMQ, Termii SDK, Africa's Talking SDK, Firebase Admin",
+    prompt: "How do I build a multi-channel notification service with BullMQ and Termii?"
+  },
+  {
+    id: "analytics",
+    lang: "Node.js", color: "#BA7517", bg: "#FAEEDA", textColor: "#633806",
+    name: "B2B analytics service",
+    desc: "Dashboard API, data subscriptions",
+    why: "The B2B analytics API is a data aggregation layer — pulling from multiple sources (TimescaleDB, PostgreSQL, ML results) and serving JSON dashboards. Node.js + TypeScript excels here: fast JSON serialization, great GraphQL/REST tooling, easy to prototype new dashboard endpoints.",
+    db: "Read replicas + Redis cache", port: "8085", proto: "REST + GraphQL",
+    deps: "Reads from: Telemetry DB, ML results DB. Serves: external B2B subscribers",
+    libs: "Fastify, Apollo GraphQL, TypeORM (read), ioredis",
+    prompt: "How do I build a GraphQL analytics API in Node.js for B2B agri-intelligence?"
+  },
+  {
+    id: "ml",
+    lang: "Python", color: "#D85A30", bg: "#FAECE7", textColor: "#712B13",
+    name: "AI / ML service",
+    desc: "Crop disease, yield, credit AI",
+    why: "Non-negotiable. Python owns the ML ecosystem — PyTorch, scikit-learn, rasterio for satellite imagery, GeoPandas for farm boundaries. No other language comes close for model training, inference serving, and the scientific computing stack your credit scoring and disease detection models need.",
+    db: "MongoDB (model results)", port: "8086", proto: "REST + gRPC",
+    deps: "Reads from: Telemetry service (farm data). Serves: Fintech service (credit scores), Mobile app (disease diagnosis)",
+    libs: "FastAPI, PyTorch, scikit-learn, rasterio, GeoPandas, Celery (async jobs)",
+    prompt: "How do I build a crop disease detection model with PyTorch and serve it via FastAPI?"
+  }
+];
+
+let active = null;
+
+function render() {
+  const row = document.getElementById('svc-row');
+  row.innerHTML = services.map(s => `
+    <div class="svc ${active === s.id ? 'active' : ''}" style="${active === s.id ? 'border-color:'+s.color : ''}" onclick="toggle('${s.id}')">
+      <span class="svc-lang" style="background:${s.bg};color:${s.textColor}">${s.lang}</span>
+      <div class="svc-name">${s.name}</div>
+      <div class="svc-desc">${s.desc}</div>
+    </div>
+  `).join('');
+
+  const box = document.getElementById('detail-box');
+  if (active) {
+    const s = services.find(x => x.id === active);
+    box.innerHTML = `
+      <div class="detail">
+        <div class="detail-title" style="color:${s.color}">${s.name}</div>
+        <p style="font-size:12px;color:var(--color-text-secondary);line-height:1.5;margin-bottom:10px">${s.why}</p>
+        <div class="detail-grid">
+          <div class="detail-cell"><div class="detail-cell-label">Database</div><div class="detail-cell-val">${s.db}</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">Port</div><div class="detail-cell-val">${s.port}</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">Protocol</div><div class="detail-cell-val">${s.proto}</div></div>
+          <div class="detail-cell"><div class="detail-cell-label">Key libs</div><div class="detail-cell-val">${s.libs}</div></div>
+        </div>
+        <div class="deps">${s.deps}</div>
+        <button class="ask-btn" onclick="sendPrompt('${s.prompt}')">${s.prompt} ↗</button>
+      </div>
+    `;
+  } else {
+    box.innerHTML = '';
+  }
+}
+
+function toggle(id) {
+  active = active === id ? null : id;
+  render();
+}
+
+render();
+</script>

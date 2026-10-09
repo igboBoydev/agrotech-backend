@@ -1,0 +1,40 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Docker / secrets (not the .env.example template — that one's meant to be checked in) ###
+.env
+
+### Envoy dev TLS cert — regenerate with envoy/certs/generate-dev-cert.sh, don't commit as a static blob ###
+envoy/certs/*.crt
+envoy/certs/*.key

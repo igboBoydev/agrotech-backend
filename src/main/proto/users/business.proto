@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package users;
+
+message CreateBusinessRequest {
+  string company_name = 1;
+  string company_registration_no = 2;
+  string date_of_registration = 3;
+  string country_of_registration = 4;
+  string company_address = 5;
+  string state = 6;
+  string city = 7;
+  string country = 8;
+  string last_name = 9;
+  string bvn = 10;
+  string tin = 11;
+  string address = 12;
+}
+
+message CreateBusinessResponse {
+  string message = 1;
+  string code = 2;
+}
+
+message GetBusinessProfileRequest {
+  string user_id = 1;
+}
+
+message GetBusinessProfileResponse {
+  string company_name = 1;
+  string company_registration_no = 2;
+  string date_of_registration = 3;
+  string country_of_registration = 4;
+  string company_address = 5;
+  string state = 6;
+  string city = 7;
+  string country = 8;
+  string last_name = 9;
+  string bvn = 10;
+  string tin = 11;
+  string address = 12;
+  string principal_officer_middle_name = 13;
+  string sex = 14;
+  string date_of_birth = 15;
+  string title = 16;
+  string contact_phone_number = 17;
+  string alternate_phone = 18;
+  string office_phone_number = 19;
+  string email_address = 20;
+  string nin = 21;
+  string id_type = 22;
+  string date_of_expiration = 23;
+  string place_of_issuance = 24;
+  string id_number = 25;
+  string country_of_issuance = 26;
+  string date_of_issuance = 27;
+  string fathers_name = 28;
+  string mothers_name = 29;
+  string nationality = 30;
+  string business_category = 31;
+  string ownership_structure = 32;
+  string Product = 33;
+  string branch_id = 34;
+  string signature = 35;
+  string Photo_upload = 36;
+  string introducer = 37;
+  string rsm = 38;
+  string restriction = 39;
+  string principal_officer_lastname = 40;
+  string principal_officer_first_name = 41;
+  string primary_company_address = 42;
+  string  primary_company_state = 43;
+  string  primary_company_city = 44;
+  string  primary_company_country = 45;
+  string first_name = 46;
+  string middle_name = 47;
+  string product_id = 48;
+  bool sms_notification = 49; // true or false
+  bool email_notification = 50;
+  CustomerOptions customer_options = 51;
+  bool is_linked_account = 52;
+  string linked_account_number = 53;
+  string creation_channel_code = 54;
+}
+
+message CustomerOptions {
+  string customer_created_at = 1;
+  string is_active = 2;
+}

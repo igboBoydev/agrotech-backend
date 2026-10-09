@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package marketplace;
+
+import "marketplace/enum.proto";
+
+message MarketplaceOrder {
+  string id = 1;
+  string listing_id = 2;
+  string buyer_id = 3;
+  BuyerType buyer_type = 4;
+  double quantity = 5;
+  double unit_price = 6;
+  double total_amount = 7;
+  double commission_amount = 8;
+  OrderStatus status = 9;
+  EscrowStatus escrow_status = 10;
+  string created_at = 11;
+  string updated_at = 12;
+}
+
+message PlaceOrderRequest {
+  string listing_id = 1;
+  string buyer_id = 2;
+  BuyerType buyer_type = 3;
+  double quantity = 4;
+}
+
+message PlaceOrderResponse {
+  string code = 1;
+  string message = 2;
+  MarketplaceOrder order = 3;
+}
+
+message ConfirmOrderRequest {
+  string order_id = 1;
+  bool accept = 2;
+}
+
+message ConfirmOrderResponse {
+  string code = 1;
+  string message = 2;
+  MarketplaceOrder order = 3;
+}
+
+message CompleteOrderRequest {
+  string order_id = 1;
+}
+
+message CompleteOrderResponse {
+  string code = 1;
+  string message = 2;
+  MarketplaceOrder order = 3;
+}
+
+message CancelOrderRequest {
+  string order_id = 1;
+}
+
+message CancelOrderResponse {
+  string code = 1;
+  string message = 2;
+  MarketplaceOrder order = 3;
+}
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message GetOrderResponse {
+  string code = 1;
+  string message = 2;
+  MarketplaceOrder order = 3;
+}
+
+message GetOrdersByBuyerRequest {
+  string buyer_id = 1;
+}
+
+message GetOrdersByBuyerResponse {
+  repeated MarketplaceOrder orders = 1;
+}
+
+message GetOrdersBySellerRequest {
+  string farmer_id = 1;
+}
+
+message GetOrdersBySellerResponse {
+  repeated MarketplaceOrder orders = 1;
+}

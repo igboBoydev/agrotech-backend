@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package fintech;
+
+import "fintech/enum.proto";
+
+message InsuranceClaim {
+  string id = 1;
+  double claim_amount = 2;
+  double payout_amount = 3;
+  string description = 4;
+  ClaimStatus status = 5;
+  string filed_at = 6;
+  string decided_at = 7;
+}
+
+message InsurancePolicy {
+  string id = 1;
+  string farmer_id = 2;
+  string policy_type = 3;
+  double coverage_amount = 4;
+  double premium_amount = 5;
+  double commission_amount = 6;
+  PolicyStatus status = 7;
+  string start_date = 8;
+  string end_date = 9;
+  repeated InsuranceClaim claims = 10;
+}
+
+message CreatePolicyRequest {
+  string farmer_id = 1;
+  string policy_type = 2;
+  double coverage_amount = 3;
+  double premium_amount = 4;
+  string start_date = 5;
+  string end_date = 6;
+}
+
+message CreatePolicyResponse {
+  string code = 1;
+  string message = 2;
+  InsurancePolicy policy = 3;
+}
+
+message FileClaimRequest {
+  string policy_id = 1;
+  double claim_amount = 2;
+  string description = 3;
+}
+
+message FileClaimResponse {
+  string code = 1;
+  string message = 2;
+  InsuranceClaim claim = 3;
+}
+
+message ReviewClaimRequest {
+  string claim_id = 1;
+  bool approve = 2;
+  double payout_amount = 3;
+}
+
+message ReviewClaimResponse {
+  string code = 1;
+  string message = 2;
+  InsuranceClaim claim = 3;
+}
+
+message GetPolicyRequest {
+  string policy_id = 1;
+}
+
+message GetPolicyResponse {
+  string code = 1;
+  string message = 2;
+  InsurancePolicy policy = 3;
+}
+
+message GetPoliciesByFarmerRequest {
+  string farmer_id = 1;
+}
+
+message GetPoliciesByFarmerResponse {
+  repeated InsurancePolicy policies = 1;
+}

@@ -1,0 +1,264 @@
+# FarmIQ gRPC-Web gateway — DOCKER-COMPOSE VARIANT.
+#
+# This is envoy.yaml with exactly two differences, both because this runs as its
+# own container in docker-compose.yml rather than natively on the host:
+#   1. The upstream cluster address is "app" (the compose service's Docker DNS
+#      name), not "127.0.0.1" — inside a container, 127.0.0.1 is the container
+#      itself, not the host or any other container. There is no shared file
+#      between the native and containerized paths anymore for exactly this
+#      reason (an earlier version of docker-compose.yml required hand-editing
+#      envoy.yaml's address before every switch between the two — this file
+#      exists so that's no longer necessary).
+#   2. The admin listener binds 0.0.0.0, not 127.0.0.1 — a loopback-only bind
+#      inside a container is unreachable via Docker's port-publishing (-p
+#      9901:9901 in docker-compose.yml forwards to the container's external
+#      interface, not its loopback), so 127.0.0.1 here would silently make
+#      that port mapping do nothing. Still not reachable from outside your own
+#      machine unless you explicitly publish it further — Docker's own network
+#      isolation is the safety boundary here instead of the bind address.
+#
+# Keep both files' TLS/rate-limiting/routing config in sync by hand if you
+# change one — everything else below is identical to envoy.yaml.
+#
+# The Spring Boot backend (An-Agrotech-application) serves real gRPC (HTTP/2
+# cleartext, "h2c") on the SAME port as its HTTP/actuator traffic — server.port
+# (8080 by default, application.yaml) — not a separate port. gRPC rides Tomcat
+# as a servlet (spring.grpc.server.servlet.enabled defaults to true), which is
+# why "Registering gRPC service: ..." log lines come from a class literally
+# named GrpcServletConfiguration. The application-local.yaml/application-prod.yaml
+# key "grpc.server.port: 3030" looks like it configures a separate gRPC port but
+# doesn't — the real Spring property is "spring.grpc.server.port" (note the
+# "spring." prefix), so that key is silently unread; confirmed with grpcurl
+# during setup (nothing listens on 3030 at all). Not fixed here since it's a
+# pre-existing config issue outside this gateway's scope, but flagged clearly
+# — see the comment next to that key in the yaml files.
+#
+# React Native cannot speak gRPC directly: RN's JS runtime has no HTTP/2 support,
+# which is what genuine gRPC requires. This Envoy instance translates gRPC-Web
+# (plain HTTP/1.1, works from fetch/XHR — what RN gRPC-Web client libraries use)
+# on port 8081 into real gRPC against the backend on server.port, and translates
+# the real gRPC response back into a gRPC-Web response. The mobile app talks to
+# this port over HTTPS, never plaintext and never directly at the backend.
+#
+# TLS terminates HERE, at the gateway (client-facing side) — not on the backend
+# itself, which still has no TLS story of its own (see application-prod.yaml).
+# The Envoy->backend hop stays plaintext h2c on localhost, the standard edge-
+# termination pattern. The shipped cert (envoy/certs/) is a self-signed dev
+# cert — see envoy/certs/README.md before this goes anywhere near production.
+#
+# Rate limiting is per-client-IP (envoy.filters.http.local_ratelimit, entirely
+# in-process — no external rate-limit service or Redis needed): a generous
+# default for authenticated business traffic, and a much stricter limit on the
+# public, unauthenticated auth/signup routes specifically, since those are the
+# ones exposed to credential-stuffing/OTP-spam/signup-abuse with nothing else
+# gating them. Both limits are starting points to tune against real traffic,
+# not measured figures.
+#
+# Run locally (Docker daemon not required):
+#   brew install envoy
+#   envoy/certs/generate-dev-cert.sh    # first time only (or to rotate)
+#   envoy --mode validate -c envoy/envoy.yaml   # sanity-check the config
+#   envoy -c envoy/envoy.yaml                   # run from the repo root — cert
+#                                                # paths below are relative to it
+#
+# Auth: gRPC-Web maps HTTP headers 1:1 onto gRPC metadata, so the mobile app
+# sends a normal "authorization: Bearer <jwt>" HTTP header and
+# JwtAuthServerInterceptor on the backend sees it exactly as it does for any
+# other gRPC caller — no special handling needed here.
+
+admin:
+  address:
+    socket_address:
+      # 0.0.0.0, not 127.0.0.1 — see the file header comment for why. Docker's
+      # own network isolation (no -p publish beyond what docker-compose.yml
+      # declares) is what keeps this off the open network, not the bind address.
+      address: 0.0.0.0
+      port_value: 9901
+
+static_resources:
+  listeners:
+    - name: grpc_web_listener
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 8081
+      filter_chains:
+        - transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              common_tls_context:
+                tls_certificates:
+                  - certificate_chain:
+                      filename: "envoy/certs/server.crt"
+                    private_key:
+                      filename: "envoy/certs/server.key"
+          filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: farmiq_grpc_web
+                codec_type: AUTO
+                route_config:
+                  name: local_route
+                  virtual_hosts:
+                    - name: farmiq_backend
+                      domains: ["*"]
+                      # CORS is permissive here for local development only — browser-based
+                      # gRPC-Web tooling and RN debug builds both need it. Tighten
+                      # allow_origin_string_match before any real deployment; this mirrors
+                      # the same "flagged, not silently shipped" convention used everywhere
+                      # else in this backend (see application-prod.yaml, CLAUDE.md).
+                      # (Configured via typed_per_filter_config, not the older top-level
+                      # VirtualHost.cors field, which Envoy 1.39 flags as deprecated.)
+                      typed_per_filter_config:
+                        envoy.filters.http.cors:
+                          "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.CorsPolicy
+                          allow_origin_string_match:
+                            - safe_regex:
+                                regex: ".*"
+                          allow_methods: "GET, PUT, DELETE, POST, OPTIONS"
+                          allow_headers: "authorization,content-type,x-grpc-web,x-user-agent,grpc-timeout"
+                          expose_headers: "grpc-status,grpc-message,grpc-status-details-bin"
+                          max_age: "1728000"
+                      routes:
+                        # Public, unauthenticated RPCs (see JwtAuthServerInterceptor's allowlist
+                        # on the backend) get their own routes so they can carry a materially
+                        # stricter per-IP rate limit — nothing but the network gates these calls,
+                        # unlike everything else, which already needs a valid JWT.
+                        - match: { path: "/auth.AuthDataService/FarmerLogin" }
+                          route: { cluster: farmiq_grpc, timeout: 60s }
+                          typed_per_filter_config:
+                            envoy.filters.http.local_ratelimit: &strict_auth_rate_limit
+                              "@type": type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+                              stat_prefix: auth_route_rate_limiter
+                              token_bucket:
+                                max_tokens: 10
+                                tokens_per_fill: 10
+                                fill_interval: 60s
+                              filter_enabled:
+                                runtime_key: local_rate_limit_enabled
+                                default_value: { numerator: 100, denominator: HUNDRED }
+                              filter_enforced:
+                                runtime_key: local_rate_limit_enforced
+                                default_value: { numerator: 100, denominator: HUNDRED }
+                              enable_x_ratelimit_headers: DRAFT_VERSION_03
+                              # 10 requests/minute per source IP — anti brute-force/OTP-spam/
+                              # signup-abuse limit for FarmerLogin/GenerateToken/ValidateToken/
+                              # ValidateEmail/ValidatePhone/CreateFarmer/CreateBusiness.
+                              # rate_limits generates the per-source-IP descriptor (the modern,
+                              # non-deprecated way to do this on the local_ratelimit filter — the
+                              # older split of route-level `rate_limits` + filter-level bare
+                              # `descriptors` still parses but Envoy 1.39 warns it "will be
+                              # ignored in the future").
+                              rate_limits:
+                                - actions:
+                                    - remote_address: {}
+                              descriptors:
+                                - entries:
+                                    - key: remote_address
+                                  token_bucket:
+                                    max_tokens: 10
+                                    tokens_per_fill: 10
+                                    fill_interval: 60s
+                        - match: { path: "/auth.AuthDataService/GenerateToken" }
+                          route: { cluster: farmiq_grpc, timeout: 60s }
+                          typed_per_filter_config:
+                            envoy.filters.http.local_ratelimit: *strict_auth_rate_limit
+                        - match: { path: "/auth.AuthDataService/ValidateToken" }
+                          route: { cluster: farmiq_grpc, timeout: 60s }
+                          typed_per_filter_config:
+                            envoy.filters.http.local_ratelimit: *strict_auth_rate_limit
+                        - match: { path: "/auth.AuthDataService/ValidateEmail" }
+                          route: { cluster: farmiq_grpc, timeout: 60s }
+                          typed_per_filter_config:
+                            envoy.filters.http.local_ratelimit: *strict_auth_rate_limit
+                        - match: { path: "/auth.AuthDataService/ValidatePhone" }
+                          route: { cluster: farmiq_grpc, timeout: 60s }
+                          typed_per_filter_config:
+                            envoy.filters.http.local_ratelimit: *strict_auth_rate_limit
+                        - match: { path: "/users.UsersService/CreateFarmer" }
+                          route: { cluster: farmiq_grpc, timeout: 60s }
+                          typed_per_filter_config:
+                            envoy.filters.http.local_ratelimit: *strict_auth_rate_limit
+                        - match: { path: "/users.UsersService/CreateBusiness" }
+                          route: { cluster: farmiq_grpc, timeout: 60s }
+                          typed_per_filter_config:
+                            envoy.filters.http.local_ratelimit: *strict_auth_rate_limit
+                        # Everything else — all RPCs that already require a JWT — falls through
+                        # here and gets the more generous default rate limit configured on the
+                        # local_ratelimit filter itself (120/min per IP, see http_filters below).
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: farmiq_grpc
+                            timeout: 60s
+                http_filters:
+                  - name: envoy.filters.http.grpc_web
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb
+                  - name: envoy.filters.http.cors
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+                  - name: envoy.filters.http.local_ratelimit
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+                      stat_prefix: default_rate_limiter
+                      token_bucket:
+                        max_tokens: 120
+                        tokens_per_fill: 120
+                        fill_interval: 60s
+                      filter_enabled:
+                        runtime_key: local_rate_limit_enabled
+                        default_value: { numerator: 100, denominator: HUNDRED }
+                      filter_enforced:
+                        runtime_key: local_rate_limit_enforced
+                        default_value: { numerator: 100, denominator: HUNDRED }
+                      enable_x_ratelimit_headers: DRAFT_VERSION_03
+                      # 120 requests/minute (~2/s sustained) per source IP — generous default
+                      # for authenticated business RPCs, overridden much lower on the specific
+                      # public auth routes above. rate_limits generates the per-source-IP
+                      # descriptor (see the comment on the stricter auth-route config above for
+                      # why this field, not the older route-level rate_limits + bare filter
+                      # descriptors split).
+                      rate_limits:
+                        - actions:
+                            - remote_address: {}
+                      descriptors:
+                        - entries:
+                            - key: remote_address
+                          token_bucket:
+                            max_tokens: 120
+                            tokens_per_fill: 120
+                            fill_interval: 60s
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+  clusters:
+    - name: farmiq_grpc
+      connect_timeout: 5s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      # Cleartext HTTP/2 (h2c) — matches the backend exactly (no TLS configured
+      # anywhere in this app yet; see CLAUDE.md/application-prod.yaml notes on that
+      # being a pre-production gap). TLS for mobile clients terminates at this
+      # gateway's listener above instead; this upstream hop is localhost-only.
+      typed_extension_protocol_options:
+        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+          "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+          explicit_http_config:
+            http2_protocol_options: {}
+      load_assignment:
+        cluster_name: farmiq_grpc
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      # "app" = the Spring Boot container's compose service name, resolved
+                      # via Docker's embedded DNS — not 127.0.0.1 (see file header).
+                      address: app
+                      # This is server.port (Tomcat), not a dedicated gRPC port — see
+                      # envoy.yaml's comment at the top of that file for why.
+                      port_value: 8080
