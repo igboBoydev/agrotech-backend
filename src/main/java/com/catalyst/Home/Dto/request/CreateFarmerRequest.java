@@ -1,5 +1,15 @@
-package com.catalyst.Home.DTO.request;
+package com.catalyst.Home.Dto.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateFarmerRequest {
     private String firstName;
     private String lastName;

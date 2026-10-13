@@ -3,7 +3,7 @@ package com.catalyst.Home.GrpcControllers;
 import analytics.AnalyticsServiceGrpc;
 import analytics.Insights;
 import analytics.SubscriptionOuterClass;
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import com.catalyst.Home.Services.AnalyticsService;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;

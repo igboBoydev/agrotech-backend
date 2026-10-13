@@ -1,7 +1,7 @@
 package com.catalyst.Home.Services;
 
 
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import users.Business;
 import users.Farmers;
 import users.KycOuterClass;

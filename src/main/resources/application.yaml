@@ -3,3 +3,7 @@ server:
 spring:
   profiles:
     active: local
+
+logging:
+  level:
+    com.catalyst.Home.Config.GrpcLoggingInterceptor: INFO   # set to WARN to silence request/response logging

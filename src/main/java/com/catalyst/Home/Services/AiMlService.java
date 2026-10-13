@@ -3,7 +3,7 @@ package com.catalyst.Home.Services;
 import aiml.Advisory;
 import aiml.Diagnosis;
 import aiml.Yield;
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 
 public interface AiMlService {
 

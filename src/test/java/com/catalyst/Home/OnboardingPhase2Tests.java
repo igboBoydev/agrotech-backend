@@ -1,7 +1,6 @@
 package com.catalyst.Home;
 
-import com.catalyst.Home.DTO.response.GrpcResponse;
-import com.catalyst.Home.Entity.FarmersDetails;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import com.catalyst.Home.Entity.FarmersKyc;
 import com.catalyst.Home.Entity.Farms;
 import com.catalyst.Home.Repositories.BusinessRepository;

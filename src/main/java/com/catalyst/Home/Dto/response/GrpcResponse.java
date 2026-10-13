@@ -1,4 +1,4 @@
-package com.catalyst.Home.DTO.response;
+package com.catalyst.Home.Dto.response;
 
 import io.grpc.Status;
 import lombok.AllArgsConstructor;

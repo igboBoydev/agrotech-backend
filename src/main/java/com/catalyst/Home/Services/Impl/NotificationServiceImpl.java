@@ -1,6 +1,6 @@
 package com.catalyst.Home.Services.Impl;
 
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import com.catalyst.Home.Repositories.NotificationPreferenceRepository;
 import com.catalyst.Home.Repositories.NotificationRepository;
 import com.catalyst.Home.Services.NotificationService;

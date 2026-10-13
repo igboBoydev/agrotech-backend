@@ -1,6 +1,6 @@
 package com.catalyst.Home;
 
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import com.catalyst.Home.Repositories.FarmerRepository;
 import com.catalyst.Home.Repositories.FarmsRepository;
 import com.catalyst.Home.Repositories.GpsLocationRepository;

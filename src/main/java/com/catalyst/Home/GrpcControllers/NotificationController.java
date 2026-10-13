@@ -1,6 +1,6 @@
 package com.catalyst.Home.GrpcControllers;
 
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import com.catalyst.Home.Services.NotificationService;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;

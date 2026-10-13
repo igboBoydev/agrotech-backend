@@ -96,6 +96,7 @@ message FarmerLoginResponse {
   string token = 1;
   string message = 2;
   string code = 3;
+  string uuid = 4;
 }
 
 enum ValidateType {

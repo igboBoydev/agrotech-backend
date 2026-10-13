@@ -2,7 +2,7 @@ package com.catalyst.Home;
 
 import analytics.Insights;
 import analytics.SubscriptionOuterClass;
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import com.catalyst.Home.Repositories.BusinessRepository;
 import com.catalyst.Home.Repositories.FarmProductsRepository;
 import com.catalyst.Home.Repositories.FarmerRepository;

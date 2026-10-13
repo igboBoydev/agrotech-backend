@@ -1,8 +1,10 @@
 package com.catalyst.Home.Services.Impl;
 
 import auth.Auth;
+import com.catalyst.Home.Entity.FarmersDetails;
 import com.catalyst.Home.Entity.TokenValidation;
 import com.catalyst.Home.Entity.Users;
+import com.catalyst.Home.Repositories.FarmerRepository;
 import com.catalyst.Home.Repositories.TokenValidationRepository;
 import com.catalyst.Home.Repositories.UsersRepository;
 import com.catalyst.Home.Security.JwtService;
@@ -31,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private final UsersRepository usersRepository;
     private final TokenValidationRepository tokenValidationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FarmerRepository farmerRepository;
     private final JwtService jwtService;
 
     @Value("${app.jwt.otp-expiration-ms}")
@@ -38,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Auth.GenerateTokenResponse generateToken(Auth.GenerateTokenRequest request) {
+        log.info("started generateToken ==================== ");
         String otp = String.valueOf(100000 + RANDOM.nextInt(900000));
         ZonedDateTime now = ZonedDateTime.now();
 
@@ -125,6 +129,15 @@ public class AuthServiceImpl implements AuthService {
                     .build();
         }
 
+        Optional<FarmersDetails> customerByEmail = farmerRepository.findByEmail(request.getEmail());
+
+        if (customerByEmail.isEmpty()) {
+            return Auth.FarmerLoginResponse.newBuilder()
+                    .setMessage("Account not found")
+                    .setCode("403")
+                    .build();
+        }
+
         String token = jwtService.generateToken(user.getEmail(), Map.of(
                 "userId", user.getId(),
                 "role", user.getRole().name()
@@ -132,6 +145,7 @@ public class AuthServiceImpl implements AuthService {
 
         return Auth.FarmerLoginResponse.newBuilder()
                 .setToken(token)
+                .setUuid(customerByEmail.get().getUuid())
                 .setMessage("Login successful")
                 .setCode("200")
                 .build();

@@ -29,7 +29,7 @@
 
 	<properties>
 		<java.version>17</java.version>
-		<protobuf.version>3.14.0</protobuf.version>
+		<protobuf.version>3.21.12</protobuf.version>
 		<grpc.version>1.77.1</grpc.version>
 		<protobuf-java.version>4.33.4</protobuf-java.version>
 		<spring-grpc.version>1.0.2</spring-grpc.version>
@@ -142,6 +142,12 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- Add to pom.xml <dependencies> -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.grpc</groupId>
 			<artifactId>spring-grpc-test</artifactId>
@@ -197,19 +203,25 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>1.7.1</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>detect</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- ✅ PROTOBUF MAVEN PLUGIN (UPDATED) -->
+			<plugin>
 				<groupId>org.xolstice.maven.plugins</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
 				<version>0.6.1</version>
 				<configuration>
-					<protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
-					<!-- os.detected.classifier comes from the os-maven-plugin extension declared
-					     below (<build><extensions>) — it resolves to whatever OS/arch Maven is
-					     actually running on (osx-x86_64, linux-x86_64, etc.). A hardcoded
-					     "osx-x86_64" here previously made the build fail outright on Linux
-					     (CI, Docker, teammates not on a Mac) — the protoc/plugin binaries are
-					     native executables, not portable across OSes. Found and fixed while
-					     containerizing the app: the build worked locally but failed the moment
-					     it ran inside a Linux-based Docker build stage. -->
 					<protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
 					<pluginId>grpc-java</pluginId>
 					<pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>

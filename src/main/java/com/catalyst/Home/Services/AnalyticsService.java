@@ -1,6 +1,6 @@
 package com.catalyst.Home.Services;
 
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import analytics.Insights;
 import analytics.SubscriptionOuterClass;
 

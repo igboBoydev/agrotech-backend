@@ -3,7 +3,7 @@ package com.catalyst.Home.Services.Impl;
 import aiml.Advisory;
 import aiml.Diagnosis;
 import aiml.Yield;
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import com.catalyst.Home.Entity.Farms;
 import com.catalyst.Home.Entity.VegetationIndex;
 import com.catalyst.Home.Repositories.CropDiagnosisRepository;

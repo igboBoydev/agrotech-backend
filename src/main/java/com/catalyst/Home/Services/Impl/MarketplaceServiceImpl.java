@@ -1,6 +1,6 @@
 package com.catalyst.Home.Services.Impl;
 
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import com.catalyst.Home.Entity.FarmProducts;
 import com.catalyst.Home.Entity.FarmersDetails;
 import com.catalyst.Home.Entity.MarketplaceListing;

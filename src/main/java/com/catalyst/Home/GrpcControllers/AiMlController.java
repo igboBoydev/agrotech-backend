@@ -4,7 +4,7 @@ import aiml.Advisory;
 import aiml.AiMlServiceGrpc;
 import aiml.Diagnosis;
 import aiml.Yield;
-import com.catalyst.Home.DTO.response.GrpcResponse;
+import com.catalyst.Home.Dto.response.GrpcResponse;
 import com.catalyst.Home.Services.AiMlService;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;

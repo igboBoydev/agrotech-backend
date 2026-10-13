@@ -37,12 +37,7 @@ app:
     secret: ${JWT_SECRET}   # no fallback on purpose — must be injected via the platform's secret store, never checked in
     expiration-ms: ${JWT_EXPIRATION_MS:3600000}   # 1 hour
     otp-expiration-ms: ${OTP_EXPIRATION_MS:600000}   # 10 minutes
-logging:
-  level:
-    root: INFO
-    com:
-      zaxxer:
-        hikari: INFO   # no DEBUG in prod — application-local.yaml's HikariConfig DEBUG logging is too verbose/leaks pool internals here
+
 grpc:
   server:
     port: ${GRPC_PORT:3030}   # ⚠️ dead config — see the matching comment in application-local.yaml;
